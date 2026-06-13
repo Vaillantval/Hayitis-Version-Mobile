@@ -1,0 +1,102 @@
+name: matstore_haiti
+description: Hayiti's — E-commerce mobile
+publish_to: 'none'
+version: 1.0.0+8
+
+environment:
+  sdk: ^3.7.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+
+  # HTTP & API
+  dio: ^5.7.0
+  retrofit: ^4.4.1
+  pretty_dio_logger: ^1.4.0
+
+  # Auth & stockage sécurisé
+  flutter_secure_storage: ^9.2.2
+  jwt_decoder: ^2.0.1
+
+  # State management
+  flutter_riverpod: ^2.6.1
+
+  # Navigation
+  go_router: ^14.6.2
+
+  # Images
+  cached_network_image: ^3.4.1
+  image_picker: ^1.1.2
+
+  # Paiements
+  flutter_stripe: ^11.1.0
+  url_launcher: ^6.3.1
+  webview_flutter: ^4.10.0
+
+  # Live chat — implémenté via webview_flutter (déjà présent)
+
+  # Push notifications
+  firebase_core: ^3.8.0
+  firebase_messaging: ^15.1.4
+  flutter_local_notifications: ^18.0.1
+
+  # UX & UI
+  shimmer: ^3.0.0
+  pull_to_refresh_flutter3: ^2.0.2
+  infinite_scroll_pagination: ^4.1.0
+  fluttertoast: ^8.2.9
+
+  # Fonts
+  google_fonts: ^6.2.1
+
+  # Utilitaires
+  intl: ^0.20.2
+  connectivity_plus: ^6.1.1
+  shared_preferences: ^2.3.3
+  fl_chart: ^0.69.0
+
+  # Modèles immuables & sérialisation JSON
+  freezed_annotation: ^2.4.4
+  json_annotation: ^4.9.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  build_runner: ^2.4.13
+  freezed: ^2.5.7
+  json_serializable: ^6.8.0
+  retrofit_generator: ^9.7.0
+  flutter_launcher_icons: ^0.14.3
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+    - assets/icons/
+    - assets/fonts/
+
+flutter_launcher_icons:
+  android: "ic_launcher"
+  ios: false
+  image_path: "assets/images/logo_hayitis.PNG"
+  min_sdk_android: 23
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/images/logo_hayitis.PNG"
+
+  fonts:
+    - family: Poppins
+      fonts:
+        - asset: assets/fonts/Poppins-Regular.ttf
+        - asset: assets/fonts/Poppins-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Poppins-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Poppins-Bold.ttf
+          weight: 700
