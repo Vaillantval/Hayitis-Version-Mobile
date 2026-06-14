@@ -10,7 +10,7 @@ _$DirectMessageImpl _$$DirectMessageImplFromJson(Map<String, dynamic> json) =>
     _$DirectMessageImpl(
       id: (json['id'] as num).toInt(),
       content: json['content'] as String,
-      isFromClient: json['is_from_client'] as bool? ?? true,
+      isFromClient: json['is_from_client'] as bool? ?? false,
       createdAt: DateTime.parse(json['created_at'] as String),
       attachments:
           (json['attachments'] as List<dynamic>?)

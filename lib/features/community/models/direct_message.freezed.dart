@@ -185,7 +185,7 @@ class _$DirectMessageImpl implements _DirectMessage {
   const _$DirectMessageImpl({
     required this.id,
     required this.content,
-    @JsonKey(name: 'is_from_client') this.isFromClient = true,
+    @JsonKey(name: 'is_from_client') this.isFromClient = false,
     @JsonKey(name: 'created_at') required this.createdAt,
     final List<String> attachments = const [],
   }) : _attachments = attachments;
