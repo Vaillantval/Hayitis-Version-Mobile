@@ -118,11 +118,12 @@ class _ClientSupportViewState extends ConsumerState<_ClientSupportView> {
   Future<void> _send() async {
     final text = _textCtrl.text.trim();
     if (text.isEmpty && _pendingImages.isEmpty) return;
-    final images = List<XFile>.from(_pendingImages);
+    final replyId = _replyToId;
+    final images  = List<XFile>.from(_pendingImages);
     _textCtrl.clear();
-    setState(() => _pendingImages.clear());
+    setState(() { _pendingImages.clear(); _replyToId = null; _replyAuthor = null; _replySnippet = null; });
     try {
-      await ref.read(supportFeedProvider.notifier).send(text, images: images);
+      await ref.read(supportFeedProvider.notifier).send(text, replyToId: replyId, images: images);
       WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
     } catch (e) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(
@@ -354,15 +355,16 @@ class _AdminConversationViewState extends ConsumerState<_AdminConversationView> 
   Future<void> _send() async {
     final text = _textCtrl.text.trim();
     if (text.isEmpty && _pendingImages.isEmpty) return;
-    final images = List<XFile>.from(_pendingImages);
+    final replyId = _replyToId;
+    final images  = List<XFile>.from(_pendingImages);
     _textCtrl.clear();
-    setState(() { _pendingImages.clear(); _sending = true; });
+    setState(() { _pendingImages.clear(); _sending = true; _replyToId = null; _replyAuthor = null; _replySnippet = null; });
     try {
       final multiparts = await Future.wait(
         images.map((f) => MultipartFile.fromFile(f.path, filename: f.name)),
       );
       final msg = await ref.read(communityRepositoryProvider)
-          .postConversationMessage(widget.conv.id, text, images: multiparts);
+          .postConversationMessage(widget.conv.id, text, replyToId: replyId, images: multiparts);
       if (mounted) setState(() { _messages.add(msg); _sending = false; });
       WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
     } catch (_) {
@@ -646,6 +648,7 @@ class _DMBubble extends StatelessWidget {
                 boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 4, offset: const Offset(0, 2))],
               ),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                if (msg.replyTo != null) _DmReplyContext(reply: msg.replyTo!, isOwn: _isRight),
                 if (msg.content.isNotEmpty)
                   Text(msg.content,
                     style: GoogleFonts.nunito(fontSize: 14, color: _isRight ? Colors.white : AppColors.dark, height: 1.4)),
@@ -700,6 +703,32 @@ class _DMBubble extends StatelessWidget {
   String _fmtTime(DateTime dt) {
     final l = dt.toLocal();
     return '${l.hour.toString().padLeft(2, '0')}:${l.minute.toString().padLeft(2, '0')}';
+  }
+}
+
+class _DmReplyContext extends StatelessWidget {
+  final DmReplyTo reply;
+  final bool isOwn;
+  const _DmReplyContext({required this.reply, required this.isOwn});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 6),
+      padding: const EdgeInsets.fromLTRB(8, 4, 8, 4),
+      decoration: BoxDecoration(
+        border: Border(left: BorderSide(color: isOwn ? Colors.white54 : _kAccent, width: 3)),
+        color: isOwn ? Colors.white.withValues(alpha: 0.1) : _kAccent.withValues(alpha: 0.06),
+        borderRadius: const BorderRadius.only(topRight: Radius.circular(6), bottomRight: Radius.circular(6)),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(reply.senderName,
+          style: GoogleFonts.nunito(fontSize: 11, fontWeight: FontWeight.w700,
+            color: isOwn ? Colors.white : _kAccent)),
+        Text(reply.excerpt, maxLines: 1, overflow: TextOverflow.ellipsis,
+          style: GoogleFonts.nunito(fontSize: 11, color: isOwn ? Colors.white70 : AppColors.textMuted)),
+      ]),
+    );
   }
 }
 

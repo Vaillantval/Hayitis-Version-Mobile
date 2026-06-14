@@ -15,6 +15,218 @@ final _privateConstructorUsedError = UnsupportedError(
   'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
 );
 
+DmReplyTo _$DmReplyToFromJson(Map<String, dynamic> json) {
+  return _DmReplyTo.fromJson(json);
+}
+
+/// @nodoc
+mixin _$DmReplyTo {
+  int get id => throw _privateConstructorUsedError;
+  @JsonKey(name: 'sender_name')
+  String get senderName => throw _privateConstructorUsedError;
+  String get excerpt => throw _privateConstructorUsedError;
+
+  /// Serializes this DmReplyTo to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of DmReplyTo
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $DmReplyToCopyWith<DmReplyTo> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $DmReplyToCopyWith<$Res> {
+  factory $DmReplyToCopyWith(DmReplyTo value, $Res Function(DmReplyTo) then) =
+      _$DmReplyToCopyWithImpl<$Res, DmReplyTo>;
+  @useResult
+  $Res call({
+    int id,
+    @JsonKey(name: 'sender_name') String senderName,
+    String excerpt,
+  });
+}
+
+/// @nodoc
+class _$DmReplyToCopyWithImpl<$Res, $Val extends DmReplyTo>
+    implements $DmReplyToCopyWith<$Res> {
+  _$DmReplyToCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of DmReplyTo
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? senderName = null,
+    Object? excerpt = null,
+  }) {
+    return _then(
+      _value.copyWith(
+            id:
+                null == id
+                    ? _value.id
+                    : id // ignore: cast_nullable_to_non_nullable
+                        as int,
+            senderName:
+                null == senderName
+                    ? _value.senderName
+                    : senderName // ignore: cast_nullable_to_non_nullable
+                        as String,
+            excerpt:
+                null == excerpt
+                    ? _value.excerpt
+                    : excerpt // ignore: cast_nullable_to_non_nullable
+                        as String,
+          )
+          as $Val,
+    );
+  }
+}
+
+/// @nodoc
+abstract class _$$DmReplyToImplCopyWith<$Res>
+    implements $DmReplyToCopyWith<$Res> {
+  factory _$$DmReplyToImplCopyWith(
+    _$DmReplyToImpl value,
+    $Res Function(_$DmReplyToImpl) then,
+  ) = __$$DmReplyToImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({
+    int id,
+    @JsonKey(name: 'sender_name') String senderName,
+    String excerpt,
+  });
+}
+
+/// @nodoc
+class __$$DmReplyToImplCopyWithImpl<$Res>
+    extends _$DmReplyToCopyWithImpl<$Res, _$DmReplyToImpl>
+    implements _$$DmReplyToImplCopyWith<$Res> {
+  __$$DmReplyToImplCopyWithImpl(
+    _$DmReplyToImpl _value,
+    $Res Function(_$DmReplyToImpl) _then,
+  ) : super(_value, _then);
+
+  /// Create a copy of DmReplyTo
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? senderName = null,
+    Object? excerpt = null,
+  }) {
+    return _then(
+      _$DmReplyToImpl(
+        id:
+            null == id
+                ? _value.id
+                : id // ignore: cast_nullable_to_non_nullable
+                    as int,
+        senderName:
+            null == senderName
+                ? _value.senderName
+                : senderName // ignore: cast_nullable_to_non_nullable
+                    as String,
+        excerpt:
+            null == excerpt
+                ? _value.excerpt
+                : excerpt // ignore: cast_nullable_to_non_nullable
+                    as String,
+      ),
+    );
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$DmReplyToImpl implements _DmReplyTo {
+  const _$DmReplyToImpl({
+    required this.id,
+    @JsonKey(name: 'sender_name') this.senderName = '',
+    this.excerpt = '',
+  });
+
+  factory _$DmReplyToImpl.fromJson(Map<String, dynamic> json) =>
+      _$$DmReplyToImplFromJson(json);
+
+  @override
+  final int id;
+  @override
+  @JsonKey(name: 'sender_name')
+  final String senderName;
+  @override
+  @JsonKey()
+  final String excerpt;
+
+  @override
+  String toString() {
+    return 'DmReplyTo(id: $id, senderName: $senderName, excerpt: $excerpt)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$DmReplyToImpl &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.senderName, senderName) ||
+                other.senderName == senderName) &&
+            (identical(other.excerpt, excerpt) || other.excerpt == excerpt));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, id, senderName, excerpt);
+
+  /// Create a copy of DmReplyTo
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$DmReplyToImplCopyWith<_$DmReplyToImpl> get copyWith =>
+      __$$DmReplyToImplCopyWithImpl<_$DmReplyToImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$DmReplyToImplToJson(this);
+  }
+}
+
+abstract class _DmReplyTo implements DmReplyTo {
+  const factory _DmReplyTo({
+    required final int id,
+    @JsonKey(name: 'sender_name') final String senderName,
+    final String excerpt,
+  }) = _$DmReplyToImpl;
+
+  factory _DmReplyTo.fromJson(Map<String, dynamic> json) =
+      _$DmReplyToImpl.fromJson;
+
+  @override
+  int get id;
+  @override
+  @JsonKey(name: 'sender_name')
+  String get senderName;
+  @override
+  String get excerpt;
+
+  /// Create a copy of DmReplyTo
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$DmReplyToImplCopyWith<_$DmReplyToImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
 DirectMessage _$DirectMessageFromJson(Map<String, dynamic> json) {
   return _DirectMessage.fromJson(json);
 }
@@ -29,6 +241,8 @@ mixin _$DirectMessage {
   bool get isAdmin => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
   DateTime get createdAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'reply_to')
+  DmReplyTo? get replyTo => throw _privateConstructorUsedError;
   List<String> get attachments => throw _privateConstructorUsedError;
 
   /// Serializes this DirectMessage to a JSON map.
@@ -54,8 +268,11 @@ abstract class $DirectMessageCopyWith<$Res> {
     @JsonKey(name: 'is_own') bool isOwn,
     @JsonKey(name: 'is_admin') bool isAdmin,
     @JsonKey(name: 'created_at') DateTime createdAt,
+    @JsonKey(name: 'reply_to') DmReplyTo? replyTo,
     List<String> attachments,
   });
+
+  $DmReplyToCopyWith<$Res>? get replyTo;
 }
 
 /// @nodoc
@@ -78,6 +295,7 @@ class _$DirectMessageCopyWithImpl<$Res, $Val extends DirectMessage>
     Object? isOwn = null,
     Object? isAdmin = null,
     Object? createdAt = null,
+    Object? replyTo = freezed,
     Object? attachments = null,
   }) {
     return _then(
@@ -107,6 +325,11 @@ class _$DirectMessageCopyWithImpl<$Res, $Val extends DirectMessage>
                     ? _value.createdAt
                     : createdAt // ignore: cast_nullable_to_non_nullable
                         as DateTime,
+            replyTo:
+                freezed == replyTo
+                    ? _value.replyTo
+                    : replyTo // ignore: cast_nullable_to_non_nullable
+                        as DmReplyTo?,
             attachments:
                 null == attachments
                     ? _value.attachments
@@ -115,6 +338,20 @@ class _$DirectMessageCopyWithImpl<$Res, $Val extends DirectMessage>
           )
           as $Val,
     );
+  }
+
+  /// Create a copy of DirectMessage
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $DmReplyToCopyWith<$Res>? get replyTo {
+    if (_value.replyTo == null) {
+      return null;
+    }
+
+    return $DmReplyToCopyWith<$Res>(_value.replyTo!, (value) {
+      return _then(_value.copyWith(replyTo: value) as $Val);
+    });
   }
 }
 
@@ -133,8 +370,12 @@ abstract class _$$DirectMessageImplCopyWith<$Res>
     @JsonKey(name: 'is_own') bool isOwn,
     @JsonKey(name: 'is_admin') bool isAdmin,
     @JsonKey(name: 'created_at') DateTime createdAt,
+    @JsonKey(name: 'reply_to') DmReplyTo? replyTo,
     List<String> attachments,
   });
+
+  @override
+  $DmReplyToCopyWith<$Res>? get replyTo;
 }
 
 /// @nodoc
@@ -156,6 +397,7 @@ class __$$DirectMessageImplCopyWithImpl<$Res>
     Object? isOwn = null,
     Object? isAdmin = null,
     Object? createdAt = null,
+    Object? replyTo = freezed,
     Object? attachments = null,
   }) {
     return _then(
@@ -185,6 +427,11 @@ class __$$DirectMessageImplCopyWithImpl<$Res>
                 ? _value.createdAt
                 : createdAt // ignore: cast_nullable_to_non_nullable
                     as DateTime,
+        replyTo:
+            freezed == replyTo
+                ? _value.replyTo
+                : replyTo // ignore: cast_nullable_to_non_nullable
+                    as DmReplyTo?,
         attachments:
             null == attachments
                 ? _value._attachments
@@ -204,6 +451,7 @@ class _$DirectMessageImpl implements _DirectMessage {
     @JsonKey(name: 'is_own') this.isOwn = false,
     @JsonKey(name: 'is_admin') this.isAdmin = false,
     @JsonKey(name: 'created_at') required this.createdAt,
+    @JsonKey(name: 'reply_to') this.replyTo,
     final List<String> attachments = const [],
   }) : _attachments = attachments;
 
@@ -223,6 +471,9 @@ class _$DirectMessageImpl implements _DirectMessage {
   @override
   @JsonKey(name: 'created_at')
   final DateTime createdAt;
+  @override
+  @JsonKey(name: 'reply_to')
+  final DmReplyTo? replyTo;
   final List<String> _attachments;
   @override
   @JsonKey()
@@ -234,7 +485,7 @@ class _$DirectMessageImpl implements _DirectMessage {
 
   @override
   String toString() {
-    return 'DirectMessage(id: $id, content: $content, isOwn: $isOwn, isAdmin: $isAdmin, createdAt: $createdAt, attachments: $attachments)';
+    return 'DirectMessage(id: $id, content: $content, isOwn: $isOwn, isAdmin: $isAdmin, createdAt: $createdAt, replyTo: $replyTo, attachments: $attachments)';
   }
 
   @override
@@ -248,6 +499,7 @@ class _$DirectMessageImpl implements _DirectMessage {
             (identical(other.isAdmin, isAdmin) || other.isAdmin == isAdmin) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
+            (identical(other.replyTo, replyTo) || other.replyTo == replyTo) &&
             const DeepCollectionEquality().equals(
               other._attachments,
               _attachments,
@@ -263,6 +515,7 @@ class _$DirectMessageImpl implements _DirectMessage {
     isOwn,
     isAdmin,
     createdAt,
+    replyTo,
     const DeepCollectionEquality().hash(_attachments),
   );
 
@@ -287,6 +540,7 @@ abstract class _DirectMessage implements DirectMessage {
     @JsonKey(name: 'is_own') final bool isOwn,
     @JsonKey(name: 'is_admin') final bool isAdmin,
     @JsonKey(name: 'created_at') required final DateTime createdAt,
+    @JsonKey(name: 'reply_to') final DmReplyTo? replyTo,
     final List<String> attachments,
   }) = _$DirectMessageImpl;
 
@@ -306,6 +560,9 @@ abstract class _DirectMessage implements DirectMessage {
   @override
   @JsonKey(name: 'created_at')
   DateTime get createdAt;
+  @override
+  @JsonKey(name: 'reply_to')
+  DmReplyTo? get replyTo;
   @override
   List<String> get attachments;
 

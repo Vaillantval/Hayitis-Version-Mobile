@@ -3,6 +3,18 @@ part 'community_message.freezed.dart';
 part 'community_message.g.dart';
 
 @freezed
+class MsgProduct with _$MsgProduct {
+  const factory MsgProduct({
+    required int id,
+    @Default('') String name,
+    @Default('') String slug,
+    @Default('') String image,
+    @Default(0.0) double price,
+  }) = _MsgProduct;
+  factory MsgProduct.fromJson(Map<String, dynamic> json) => _$MsgProductFromJson(json);
+}
+
+@freezed
 class MsgReplyTo with _$MsgReplyTo {
   const factory MsgReplyTo({
     required int id,
@@ -26,6 +38,7 @@ class CommunityMessage with _$CommunityMessage {
     @JsonKey(name: 'is_own')       @Default(false) bool isOwn,
     @JsonKey(name: 'can_moderate') @Default(false) bool canModerate,
     @JsonKey(name: 'reply_to')     MsgReplyTo? replyTo,
+    MsgProduct? product,
     @Default([]) List<String> attachments,
     // API returns {"❤️": 3} — dict emoji → count
     @Default({}) Map<String, int> reactions,

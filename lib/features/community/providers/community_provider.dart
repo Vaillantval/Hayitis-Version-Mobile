@@ -267,13 +267,13 @@ class SupportFeedNotifier extends AutoDisposeAsyncNotifier<SupportFeedState> {
     } catch (_) {}
   }
 
-  Future<void> send(String content, {List<XFile>? images}) async {
+  Future<void> send(String content, {int? replyToId, List<XFile>? images}) async {
     final current = state.valueOrNull;
     if (current == null) return;
     state = AsyncData(current.copyWith(isSending: true));
     try {
       final multiparts = await _filesToMultiparts(images);
-      final msg = await _repo.postSupportMessage(content, images: multiparts);
+      final msg = await _repo.postSupportMessage(content, replyToId: replyToId, images: multiparts);
       _lastId = msg.id;
       state = AsyncData(current.copyWith(messages: [...current.messages, msg], isSending: false));
     } catch (e) {

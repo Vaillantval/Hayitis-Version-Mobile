@@ -39,7 +39,7 @@ import '../../features/admin/screens/admin_customer_detail_screen.dart';
 import '../../features/admin/screens/admin_inventory_screen.dart';
 import '../../features/admin/screens/admin_reports_screen.dart';
 import '../../features/admin/screens/admin_category_list_screen.dart';
-import '../../features/chat/screens/chat_screen.dart';
+
 import '../../features/community/screens/community_screen.dart';
 import '../../features/community/screens/support_screen.dart';
 import '../notifications/fcm_service.dart';
@@ -154,11 +154,7 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       GoRoute(
         path: '/chat',
-        builder: (_, state) {
-          final orderIdStr = state.uri.queryParameters['orderId'];
-          final orderId = orderIdStr != null ? int.tryParse(orderIdStr) : null;
-          return ChatScreen(orderId: orderId);
-        },
+        redirect: (_, __) => '/community/support',
       ),
       GoRoute(path: '/community/support', builder: (_, __) => const SupportScreen()),
 

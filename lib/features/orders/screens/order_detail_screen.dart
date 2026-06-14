@@ -179,7 +179,7 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
                   side: const BorderSide(color: AppColors.primary),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
-                onPressed: () => context.push('/chat?orderId=${order.id}'),
+                onPressed: () => context.push('/community/support'),
               ),
             ],
           ),

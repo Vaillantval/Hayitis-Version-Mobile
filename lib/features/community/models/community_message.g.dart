@@ -6,6 +6,24 @@ part of 'community_message.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
+_$MsgProductImpl _$$MsgProductImplFromJson(Map<String, dynamic> json) =>
+    _$MsgProductImpl(
+      id: (json['id'] as num).toInt(),
+      name: json['name'] as String? ?? '',
+      slug: json['slug'] as String? ?? '',
+      image: json['image'] as String? ?? '',
+      price: (json['price'] as num?)?.toDouble() ?? 0.0,
+    );
+
+Map<String, dynamic> _$$MsgProductImplToJson(_$MsgProductImpl instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'name': instance.name,
+      'slug': instance.slug,
+      'image': instance.image,
+      'price': instance.price,
+    };
+
 _$MsgReplyToImpl _$$MsgReplyToImplFromJson(Map<String, dynamic> json) =>
     _$MsgReplyToImpl(
       id: (json['id'] as num).toInt(),
@@ -36,6 +54,10 @@ _$CommunityMessageImpl _$$CommunityMessageImplFromJson(
       json['reply_to'] == null
           ? null
           : MsgReplyTo.fromJson(json['reply_to'] as Map<String, dynamic>),
+  product:
+      json['product'] == null
+          ? null
+          : MsgProduct.fromJson(json['product'] as Map<String, dynamic>),
   attachments:
       (json['attachments'] as List<dynamic>?)
           ?.map((e) => e as String)
@@ -66,6 +88,7 @@ Map<String, dynamic> _$$CommunityMessageImplToJson(
   'is_own': instance.isOwn,
   'can_moderate': instance.canModerate,
   'reply_to': instance.replyTo,
+  'product': instance.product,
   'attachments': instance.attachments,
   'reactions': instance.reactions,
   'my_reactions': instance.myReactions,

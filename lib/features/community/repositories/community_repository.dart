@@ -164,10 +164,11 @@ class CommunityRepository {
     }
   }
 
-  Future<DirectMessage> postSupportMessage(String content, {List<MultipartFile>? images}) async {
+  Future<DirectMessage> postSupportMessage(String content, {int? replyToId, List<MultipartFile>? images}) async {
     try {
       final formData = FormData.fromMap({
         'content': content,
+        if (replyToId != null) 'reply_to': replyToId,
         if (images != null && images.isNotEmpty) 'images': images,
       });
       final r = await _dio.post(Endpoints.communitySupport, data: formData);
@@ -206,10 +207,11 @@ class CommunityRepository {
     }
   }
 
-  Future<DirectMessage> postConversationMessage(int convId, String content, {List<MultipartFile>? images}) async {
+  Future<DirectMessage> postConversationMessage(int convId, String content, {int? replyToId, List<MultipartFile>? images}) async {
     try {
       final formData = FormData.fromMap({
         'content': content,
+        if (replyToId != null) 'reply_to': replyToId,
         if (images != null && images.isNotEmpty) 'images': images,
       });
       final r = await _dio.post(Endpoints.communitySupportConversationPost(convId), data: formData);

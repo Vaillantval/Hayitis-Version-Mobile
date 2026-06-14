@@ -38,7 +38,7 @@ dependencies:
   url_launcher: ^6.3.1
   webview_flutter: ^4.10.0
 
-  # Live chat — implémenté via webview_flutter (déjà présent)
+  # webview_flutter utilisé pour FAQ, Contact et À propos
 
   # Push notifications
   firebase_core: ^3.8.0

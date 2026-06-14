@@ -580,6 +580,9 @@ class _MessageBubble extends ConsumerWidget {
                         // Reply context
                         if (message.replyTo != null) _ReplyContext(reply: message.replyTo!, isOwn: isOwn),
 
+                        // Tagged product
+                        if (message.product != null) _ProductCard(product: message.product!, isOwn: isOwn),
+
                         // Content
                         if (message.isDeleted)
                           Text("Message supprimé.",
@@ -711,6 +714,66 @@ class _ReplyContext extends StatelessWidget {
         Text(reply.excerpt, maxLines: 1, overflow: TextOverflow.ellipsis,
           style: GoogleFonts.nunito(fontSize: 11, color: isOwn ? Colors.white70 : AppColors.textMuted)),
       ]),
+    );
+  }
+}
+
+class _ProductCard extends StatelessWidget {
+  final dynamic product;
+  final bool isOwn;
+  const _ProductCard({required this.product, required this.isOwn});
+
+  @override
+  Widget build(BuildContext context) {
+    final bg    = isOwn ? Colors.white.withValues(alpha: 0.15) : _kAccent.withValues(alpha: 0.06);
+    final border= isOwn ? Colors.white24 : const Color(0xFFEDE0D8);
+    final nameC = isOwn ? Colors.white   : AppColors.dark;
+    final priceC= isOwn ? Colors.white70 : _kAccent;
+
+    return GestureDetector(
+      onTap: () => context.push('/products/${product.slug}'),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 6),
+        decoration: BoxDecoration(
+          color: bg,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: border),
+        ),
+        child: Row(children: [
+          if (product.image.isNotEmpty)
+            ClipRRect(
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(10), bottomLeft: Radius.circular(10)),
+              child: CachedNetworkImage(
+                imageUrl: product.image,
+                width: 64, height: 64,
+                fit: BoxFit.cover,
+                errorWidget: (_, __, ___) => Container(
+                  width: 64, height: 64,
+                  color: Colors.black12,
+                  child: const Icon(Icons.image_not_supported_outlined, size: 24, color: Colors.white38),
+                ),
+              ),
+            ),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(product.name, maxLines: 2, overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.nunito(fontSize: 12, fontWeight: FontWeight.w700, color: nameC)),
+                const SizedBox(height: 2),
+                Text('${product.price.toStringAsFixed(2)} HTG',
+                  style: GoogleFonts.nunito(fontSize: 11, fontWeight: FontWeight.w600, color: priceC)),
+              ]),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: Icon(Icons.arrow_forward_ios_rounded,
+              size: 12, color: isOwn ? Colors.white54 : AppColors.textMuted),
+          ),
+        ]),
+      ),
     );
   }
 }

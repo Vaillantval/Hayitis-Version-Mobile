@@ -15,6 +15,251 @@ final _privateConstructorUsedError = UnsupportedError(
   'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
 );
 
+MsgProduct _$MsgProductFromJson(Map<String, dynamic> json) {
+  return _MsgProduct.fromJson(json);
+}
+
+/// @nodoc
+mixin _$MsgProduct {
+  int get id => throw _privateConstructorUsedError;
+  String get name => throw _privateConstructorUsedError;
+  String get slug => throw _privateConstructorUsedError;
+  String get image => throw _privateConstructorUsedError;
+  double get price => throw _privateConstructorUsedError;
+
+  /// Serializes this MsgProduct to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of MsgProduct
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $MsgProductCopyWith<MsgProduct> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $MsgProductCopyWith<$Res> {
+  factory $MsgProductCopyWith(
+    MsgProduct value,
+    $Res Function(MsgProduct) then,
+  ) = _$MsgProductCopyWithImpl<$Res, MsgProduct>;
+  @useResult
+  $Res call({int id, String name, String slug, String image, double price});
+}
+
+/// @nodoc
+class _$MsgProductCopyWithImpl<$Res, $Val extends MsgProduct>
+    implements $MsgProductCopyWith<$Res> {
+  _$MsgProductCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of MsgProduct
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? name = null,
+    Object? slug = null,
+    Object? image = null,
+    Object? price = null,
+  }) {
+    return _then(
+      _value.copyWith(
+            id:
+                null == id
+                    ? _value.id
+                    : id // ignore: cast_nullable_to_non_nullable
+                        as int,
+            name:
+                null == name
+                    ? _value.name
+                    : name // ignore: cast_nullable_to_non_nullable
+                        as String,
+            slug:
+                null == slug
+                    ? _value.slug
+                    : slug // ignore: cast_nullable_to_non_nullable
+                        as String,
+            image:
+                null == image
+                    ? _value.image
+                    : image // ignore: cast_nullable_to_non_nullable
+                        as String,
+            price:
+                null == price
+                    ? _value.price
+                    : price // ignore: cast_nullable_to_non_nullable
+                        as double,
+          )
+          as $Val,
+    );
+  }
+}
+
+/// @nodoc
+abstract class _$$MsgProductImplCopyWith<$Res>
+    implements $MsgProductCopyWith<$Res> {
+  factory _$$MsgProductImplCopyWith(
+    _$MsgProductImpl value,
+    $Res Function(_$MsgProductImpl) then,
+  ) = __$$MsgProductImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({int id, String name, String slug, String image, double price});
+}
+
+/// @nodoc
+class __$$MsgProductImplCopyWithImpl<$Res>
+    extends _$MsgProductCopyWithImpl<$Res, _$MsgProductImpl>
+    implements _$$MsgProductImplCopyWith<$Res> {
+  __$$MsgProductImplCopyWithImpl(
+    _$MsgProductImpl _value,
+    $Res Function(_$MsgProductImpl) _then,
+  ) : super(_value, _then);
+
+  /// Create a copy of MsgProduct
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? name = null,
+    Object? slug = null,
+    Object? image = null,
+    Object? price = null,
+  }) {
+    return _then(
+      _$MsgProductImpl(
+        id:
+            null == id
+                ? _value.id
+                : id // ignore: cast_nullable_to_non_nullable
+                    as int,
+        name:
+            null == name
+                ? _value.name
+                : name // ignore: cast_nullable_to_non_nullable
+                    as String,
+        slug:
+            null == slug
+                ? _value.slug
+                : slug // ignore: cast_nullable_to_non_nullable
+                    as String,
+        image:
+            null == image
+                ? _value.image
+                : image // ignore: cast_nullable_to_non_nullable
+                    as String,
+        price:
+            null == price
+                ? _value.price
+                : price // ignore: cast_nullable_to_non_nullable
+                    as double,
+      ),
+    );
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$MsgProductImpl implements _MsgProduct {
+  const _$MsgProductImpl({
+    required this.id,
+    this.name = '',
+    this.slug = '',
+    this.image = '',
+    this.price = 0.0,
+  });
+
+  factory _$MsgProductImpl.fromJson(Map<String, dynamic> json) =>
+      _$$MsgProductImplFromJson(json);
+
+  @override
+  final int id;
+  @override
+  @JsonKey()
+  final String name;
+  @override
+  @JsonKey()
+  final String slug;
+  @override
+  @JsonKey()
+  final String image;
+  @override
+  @JsonKey()
+  final double price;
+
+  @override
+  String toString() {
+    return 'MsgProduct(id: $id, name: $name, slug: $slug, image: $image, price: $price)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$MsgProductImpl &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.slug, slug) || other.slug == slug) &&
+            (identical(other.image, image) || other.image == image) &&
+            (identical(other.price, price) || other.price == price));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, id, name, slug, image, price);
+
+  /// Create a copy of MsgProduct
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$MsgProductImplCopyWith<_$MsgProductImpl> get copyWith =>
+      __$$MsgProductImplCopyWithImpl<_$MsgProductImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$MsgProductImplToJson(this);
+  }
+}
+
+abstract class _MsgProduct implements MsgProduct {
+  const factory _MsgProduct({
+    required final int id,
+    final String name,
+    final String slug,
+    final String image,
+    final double price,
+  }) = _$MsgProductImpl;
+
+  factory _MsgProduct.fromJson(Map<String, dynamic> json) =
+      _$MsgProductImpl.fromJson;
+
+  @override
+  int get id;
+  @override
+  String get name;
+  @override
+  String get slug;
+  @override
+  String get image;
+  @override
+  double get price;
+
+  /// Create a copy of MsgProduct
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$MsgProductImplCopyWith<_$MsgProductImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
 MsgReplyTo _$MsgReplyToFromJson(Map<String, dynamic> json) {
   return _MsgReplyTo.fromJson(json);
 }
@@ -254,6 +499,7 @@ mixin _$CommunityMessage {
   bool get canModerate => throw _privateConstructorUsedError;
   @JsonKey(name: 'reply_to')
   MsgReplyTo? get replyTo => throw _privateConstructorUsedError;
+  MsgProduct? get product => throw _privateConstructorUsedError;
   List<String> get attachments =>
       throw _privateConstructorUsedError; // API returns {"❤️": 3} — dict emoji → count
   Map<String, int> get reactions => throw _privateConstructorUsedError;
@@ -288,12 +534,14 @@ abstract class $CommunityMessageCopyWith<$Res> {
     @JsonKey(name: 'is_own') bool isOwn,
     @JsonKey(name: 'can_moderate') bool canModerate,
     @JsonKey(name: 'reply_to') MsgReplyTo? replyTo,
+    MsgProduct? product,
     List<String> attachments,
     Map<String, int> reactions,
     @JsonKey(name: 'my_reactions') List<String> myReactions,
   });
 
   $MsgReplyToCopyWith<$Res>? get replyTo;
+  $MsgProductCopyWith<$Res>? get product;
 }
 
 /// @nodoc
@@ -321,6 +569,7 @@ class _$CommunityMessageCopyWithImpl<$Res, $Val extends CommunityMessage>
     Object? isOwn = null,
     Object? canModerate = null,
     Object? replyTo = freezed,
+    Object? product = freezed,
     Object? attachments = null,
     Object? reactions = null,
     Object? myReactions = null,
@@ -377,6 +626,11 @@ class _$CommunityMessageCopyWithImpl<$Res, $Val extends CommunityMessage>
                     ? _value.replyTo
                     : replyTo // ignore: cast_nullable_to_non_nullable
                         as MsgReplyTo?,
+            product:
+                freezed == product
+                    ? _value.product
+                    : product // ignore: cast_nullable_to_non_nullable
+                        as MsgProduct?,
             attachments:
                 null == attachments
                     ? _value.attachments
@@ -410,6 +664,20 @@ class _$CommunityMessageCopyWithImpl<$Res, $Val extends CommunityMessage>
       return _then(_value.copyWith(replyTo: value) as $Val);
     });
   }
+
+  /// Create a copy of CommunityMessage
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $MsgProductCopyWith<$Res>? get product {
+    if (_value.product == null) {
+      return null;
+    }
+
+    return $MsgProductCopyWith<$Res>(_value.product!, (value) {
+      return _then(_value.copyWith(product: value) as $Val);
+    });
+  }
 }
 
 /// @nodoc
@@ -432,6 +700,7 @@ abstract class _$$CommunityMessageImplCopyWith<$Res>
     @JsonKey(name: 'is_own') bool isOwn,
     @JsonKey(name: 'can_moderate') bool canModerate,
     @JsonKey(name: 'reply_to') MsgReplyTo? replyTo,
+    MsgProduct? product,
     List<String> attachments,
     Map<String, int> reactions,
     @JsonKey(name: 'my_reactions') List<String> myReactions,
@@ -439,6 +708,8 @@ abstract class _$$CommunityMessageImplCopyWith<$Res>
 
   @override
   $MsgReplyToCopyWith<$Res>? get replyTo;
+  @override
+  $MsgProductCopyWith<$Res>? get product;
 }
 
 /// @nodoc
@@ -465,6 +736,7 @@ class __$$CommunityMessageImplCopyWithImpl<$Res>
     Object? isOwn = null,
     Object? canModerate = null,
     Object? replyTo = freezed,
+    Object? product = freezed,
     Object? attachments = null,
     Object? reactions = null,
     Object? myReactions = null,
@@ -521,6 +793,11 @@ class __$$CommunityMessageImplCopyWithImpl<$Res>
                 ? _value.replyTo
                 : replyTo // ignore: cast_nullable_to_non_nullable
                     as MsgReplyTo?,
+        product:
+            freezed == product
+                ? _value.product
+                : product // ignore: cast_nullable_to_non_nullable
+                    as MsgProduct?,
         attachments:
             null == attachments
                 ? _value._attachments
@@ -555,6 +832,7 @@ class _$CommunityMessageImpl implements _CommunityMessage {
     @JsonKey(name: 'is_own') this.isOwn = false,
     @JsonKey(name: 'can_moderate') this.canModerate = false,
     @JsonKey(name: 'reply_to') this.replyTo,
+    this.product,
     final List<String> attachments = const [],
     final Map<String, int> reactions = const {},
     @JsonKey(name: 'my_reactions') final List<String> myReactions = const [],
@@ -595,6 +873,8 @@ class _$CommunityMessageImpl implements _CommunityMessage {
   @override
   @JsonKey(name: 'reply_to')
   final MsgReplyTo? replyTo;
+  @override
+  final MsgProduct? product;
   final List<String> _attachments;
   @override
   @JsonKey()
@@ -626,7 +906,7 @@ class _$CommunityMessageImpl implements _CommunityMessage {
 
   @override
   String toString() {
-    return 'CommunityMessage(id: $id, content: $content, authorName: $authorName, createdAt: $createdAt, isPinned: $isPinned, isDeleted: $isDeleted, isStaff: $isStaff, isOwn: $isOwn, canModerate: $canModerate, replyTo: $replyTo, attachments: $attachments, reactions: $reactions, myReactions: $myReactions)';
+    return 'CommunityMessage(id: $id, content: $content, authorName: $authorName, createdAt: $createdAt, isPinned: $isPinned, isDeleted: $isDeleted, isStaff: $isStaff, isOwn: $isOwn, canModerate: $canModerate, replyTo: $replyTo, product: $product, attachments: $attachments, reactions: $reactions, myReactions: $myReactions)';
   }
 
   @override
@@ -649,6 +929,7 @@ class _$CommunityMessageImpl implements _CommunityMessage {
             (identical(other.canModerate, canModerate) ||
                 other.canModerate == canModerate) &&
             (identical(other.replyTo, replyTo) || other.replyTo == replyTo) &&
+            (identical(other.product, product) || other.product == product) &&
             const DeepCollectionEquality().equals(
               other._attachments,
               _attachments,
@@ -677,6 +958,7 @@ class _$CommunityMessageImpl implements _CommunityMessage {
     isOwn,
     canModerate,
     replyTo,
+    product,
     const DeepCollectionEquality().hash(_attachments),
     const DeepCollectionEquality().hash(_reactions),
     const DeepCollectionEquality().hash(_myReactions),
@@ -711,6 +993,7 @@ abstract class _CommunityMessage implements CommunityMessage {
     @JsonKey(name: 'is_own') final bool isOwn,
     @JsonKey(name: 'can_moderate') final bool canModerate,
     @JsonKey(name: 'reply_to') final MsgReplyTo? replyTo,
+    final MsgProduct? product,
     final List<String> attachments,
     final Map<String, int> reactions,
     @JsonKey(name: 'my_reactions') final List<String> myReactions,
@@ -747,6 +1030,8 @@ abstract class _CommunityMessage implements CommunityMessage {
   @override
   @JsonKey(name: 'reply_to')
   MsgReplyTo? get replyTo;
+  @override
+  MsgProduct? get product;
   @override
   List<String> get attachments; // API returns {"❤️": 3} — dict emoji → count
   @override
