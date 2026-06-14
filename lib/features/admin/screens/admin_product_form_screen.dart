@@ -8,12 +8,20 @@ import '../../../core/theme/app_colors.dart';
 import '../../../shared/widgets/custom_button.dart';
 import '../../../shared/widgets/custom_text_field.dart';
 import '../../products/models/category.dart';
+import '../../products/models/product.dart';
 import '../../products/providers/product_provider.dart';
 import '../repositories/admin_repository.dart';
 
 class AdminProductFormScreen extends ConsumerStatefulWidget {
   final int? productId;
-  const AdminProductFormScreen({super.key, this.productId});
+  final Product? initialProduct;
+  final List<int> initialCategoryIds;
+  const AdminProductFormScreen({
+    super.key,
+    this.productId,
+    this.initialProduct,
+    this.initialCategoryIds = const [],
+  });
 
   @override
   ConsumerState<AdminProductFormScreen> createState() => _AdminProductFormScreenState();
@@ -33,15 +41,16 @@ class _AdminProductFormScreenState extends ConsumerState<AdminProductFormScreen>
   bool _isNewArrival      = false;
   bool _isSpecialOffer    = false;
   bool _isFeatured        = false;
-  bool _isLoading         = false;
-  bool _isLoadingProduct  = false;
+  bool _isLoading      = false;
   List<String> _imagePaths = [];
   List<int> _selectedCategoryIds = [];
 
   @override
   void initState() {
     super.initState();
-    if (widget.productId != null) _loadProduct();
+    if (widget.initialProduct != null) {
+      _prefill(widget.initialProduct!, widget.initialCategoryIds);
+    }
   }
 
   @override
@@ -52,23 +61,21 @@ class _AdminProductFormScreenState extends ConsumerState<AdminProductFormScreen>
     super.dispose();
   }
 
-  Future<void> _loadProduct() async {
-    setState(() => _isLoadingProduct = true);
-    try {
-      final product = await AdminRepository().getAdminProductDetail(widget.productId!);
-      _nameCtrl.text       = product.name;
-      _descCtrl.text       = product.description;
-      _priceCtrl.text      = product.compareAtPrice.toStringAsFixed(0);
-      _soldePriceCtrl.text = product.price.toStringAsFixed(0);
-      _stockCtrl.text      = product.stockQuantity.toString();
-      _isAvailable         = product.inStock;
-      if (product.category != null) _selectedCategoryIds = [product.category!.id];
-      setState(() {});
-    } catch (_) {
-      // Pre-fill failed silently — form stays empty
-    } finally {
-      if (mounted) setState(() => _isLoadingProduct = false);
-    }
+  void _prefill(Product p, List<int> catIds) {
+    _nameCtrl.text       = p.name;
+    _descCtrl.text       = p.description;
+    _moreDescCtrl.text   = p.moreDescription ?? '';
+    _addInfoCtrl.text    = p.additionalInfo  ?? '';
+    _brandCtrl.text      = p.brand           ?? '';
+    _priceCtrl.text      = p.compareAtPrice.toStringAsFixed(0);
+    _soldePriceCtrl.text = p.price.toStringAsFixed(0);
+    _stockCtrl.text      = p.stockQuantity.toString();
+    _isAvailable         = p.inStock;
+    _isBestSeller        = p.isBestSeller;
+    _isNewArrival        = p.isNewArrival;
+    _isSpecialOffer      = p.isSpecialOffer;
+    _isFeatured          = p.isFeatured;
+    _selectedCategoryIds = catIds;
   }
 
   Future<void> _pickImages() async {
@@ -113,10 +120,10 @@ class _AdminProductFormScreenState extends ConsumerState<AdminProductFormScreen>
         if (_moreDescCtrl.text.trim().isNotEmpty) 'more_description': _moreDescCtrl.text.trim(),
         if (_addInfoCtrl.text.trim().isNotEmpty)  'additional_info':  _addInfoCtrl.text.trim(),
         if (_brandCtrl.text.trim().isNotEmpty)    'brand':            _brandCtrl.text.trim(),
-        'regular_price':    regPrice,
-        'solde_price':      soldePrice,
-        'stock_quantity':   stock,
-        'is_available':     _isAvailable,
+        'regular_price': regPrice,
+        'solde_price':   soldePrice,
+        'stock':         stock,
+        'is_available':  _isAvailable,
         'is_best_seller':   _isBestSeller,
         'is_new_arrival':   _isNewArrival,
         'is_special_offer': _isSpecialOffer,
@@ -142,12 +149,6 @@ class _AdminProductFormScreenState extends ConsumerState<AdminProductFormScreen>
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoadingProduct) {
-      return Scaffold(
-        appBar: AppBar(title: Text(widget.productId != null ? 'Modifier produit' : 'Nouveau produit')),
-        body: const Center(child: CircularProgressIndicator()),
-      );
-    }
 
     final categoriesAsync = ref.watch(categoriesProvider);
     final discount = _discount;

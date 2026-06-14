@@ -31,6 +31,7 @@ import '../../features/admin/screens/admin_shell_screen.dart';
 import '../../features/admin/screens/admin_dashboard_screen.dart';
 import '../../features/admin/screens/admin_product_list_screen.dart';
 import '../../features/admin/screens/admin_product_form_screen.dart';
+import '../../features/products/models/product.dart';
 import '../../features/admin/screens/admin_order_list_screen.dart';
 import '../../features/admin/screens/admin_order_detail_screen.dart';
 import '../../features/admin/screens/admin_customer_list_screen.dart';
@@ -171,7 +172,14 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(path: '/admin/products/new', builder: (_, __) => const AdminProductFormScreen()),
           GoRoute(
             path: '/admin/products/:id/edit',
-            builder: (_, state) => AdminProductFormScreen(productId: int.parse(state.pathParameters['id']!)),
+            builder: (_, state) {
+              final extra = state.extra as Map<String, dynamic>?;
+              return AdminProductFormScreen(
+                productId: int.parse(state.pathParameters['id']!),
+                initialProduct: extra?['product'] as Product?,
+                initialCategoryIds: (extra?['categoryIds'] as List<int>?) ?? const [],
+              );
+            },
           ),
           GoRoute(path: '/admin/orders',    builder: (_, __) => const AdminOrderListScreen()),
           GoRoute(

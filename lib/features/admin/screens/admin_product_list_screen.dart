@@ -18,9 +18,10 @@ class AdminProductListScreen extends StatefulWidget {
 
 class _AdminProductListScreenState extends State<AdminProductListScreen> {
   List<Product> _products = [];
+  final Map<int, List<int>> _categoryIds = {};
   bool _isLoading = true;
   String _search = '';
-  bool? _filterInStock; // null=tous, true=en stock, false=indisponibles
+  bool? _filterInStock;
   Timer? _debounce;
 
   @override
@@ -38,9 +39,11 @@ class _AdminProductListScreenState extends State<AdminProductListScreen> {
   Future<void> _load() async {
     setState(() => _isLoading = true);
     try {
+      _categoryIds.clear();
       final products = await AdminRepository().getAdminProducts(
         search: _search.isEmpty ? null : _search,
         inStock: _filterInStock,
+        outCategoryIds: _categoryIds,
       );
       setState(() => _products = products);
     } catch (e) {
@@ -163,7 +166,7 @@ class _AdminProductListScreenState extends State<AdminProductListScreen> {
                                       color: p.stockQuantity < 5 ? AppColors.error : AppColors.textMuted)),
                               PopupMenuButton<String>(
                                 onSelected: (v) {
-                                  if (v == 'edit')   context.push('/admin/products/${p.id}/edit').then((_) => _load());
+                                  if (v == 'edit')   context.push('/admin/products/${p.id}/edit', extra: {'product': p, 'categoryIds': _categoryIds[p.id] ?? []}).then((_) => _load());
                                   if (v == 'delete') _confirmDelete(p);
                                 },
                                 itemBuilder: (_) => const [
