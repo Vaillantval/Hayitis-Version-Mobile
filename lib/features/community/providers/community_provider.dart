@@ -85,7 +85,10 @@ class ChannelFeedNotifier extends AutoDisposeFamilyAsyncNotifier<ChannelFeedStat
       _lastId = newer.last.id;
       final current = state.valueOrNull;
       if (current != null) {
-        state = AsyncData(current.copyWith(messages: [...current.messages, ...newer]));
+        final existing = current.messages.map((m) => m.id).toSet();
+        final fresh = newer.where((m) => !existing.contains(m.id)).toList();
+        if (fresh.isEmpty) return;
+        state = AsyncData(current.copyWith(messages: [...current.messages, ...fresh]));
       }
     } catch (_) {}
   }
@@ -262,7 +265,10 @@ class SupportFeedNotifier extends AutoDisposeAsyncNotifier<SupportFeedState> {
       _lastId = newer.last.id;
       final current = state.valueOrNull;
       if (current != null) {
-        state = AsyncData(current.copyWith(messages: [...current.messages, ...newer]));
+        final existing = current.messages.map((m) => m.id).toSet();
+        final fresh = newer.where((m) => !existing.contains(m.id)).toList();
+        if (fresh.isEmpty) return;
+        state = AsyncData(current.copyWith(messages: [...current.messages, ...fresh]));
       }
     } catch (_) {}
   }
