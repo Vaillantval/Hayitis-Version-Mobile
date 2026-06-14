@@ -158,10 +158,18 @@ class FcmService {
       case 'new_order_admin':
       case 'proof_submitted':
         final id = int.tryParse(data['order_id']?.toString() ?? '');
-        if (id != null) {
-          // Le routeur GoRouter redirige vers /home si l'utilisateur n'est pas staff
-          ctx.push('/admin/orders/$id');
-        }
+        if (id != null) ctx.push('/admin/orders/$id');
+
+      // ── Communauté ──────────────────────────────────────────────────────────
+      case 'reply':
+      case 'mention':
+      case 'channel_message':
+      case 'community_message':
+        ctx.go('/community');
+
+      // ── Support privé ────────────────────────────────────────────────────────
+      case 'support':
+        ctx.push('/community/support');
 
       default:
         ctx.go('/home');
@@ -171,13 +179,18 @@ class FcmService {
   // ─── Helpers couleur & icône ───────────────────────────────────────────────
 
   static Color _colorForType(String type) => switch (type) {
-        'new_order'        => const Color(0xFF4CAF50), // vert
-        'order_status'     => const Color(0xFF2196F3), // bleu
-        'payment_verified' => const Color(0xFF009688), // sarcelle
-        'new_product'      => const Color(0xFFFF5722), // orange foncé
-        'new_order_admin'  => const Color(0xFF9C27B0), // violet
-        'proof_submitted'  => const Color(0xFFFFC107), // ambre
-        _                  => const Color(0xFF607D8B), // bleu-gris
+        'new_order'        => const Color(0xFF4CAF50),
+        'order_status'     => const Color(0xFF2196F3),
+        'payment_verified' => const Color(0xFF009688),
+        'new_product'      => const Color(0xFFFF5722),
+        'new_order_admin'  => const Color(0xFF9C27B0),
+        'proof_submitted'  => const Color(0xFFFFC107),
+        'reply'            => const Color(0xFFC62828),
+        'mention'          => const Color(0xFFC62828),
+        'channel_message'  => const Color(0xFFC62828),
+        'community_message'=> const Color(0xFFC62828),
+        'support'          => const Color(0xFFC62828),
+        _                  => const Color(0xFF607D8B),
       };
 
   static IconData _iconForType(String type) => switch (type) {
@@ -187,6 +200,11 @@ class FcmService {
         'new_product'      => Icons.new_releases_outlined,
         'new_order_admin'  => Icons.admin_panel_settings_outlined,
         'proof_submitted'  => Icons.receipt_long_outlined,
+        'reply'            => Icons.reply_outlined,
+        'mention'          => Icons.alternate_email,
+        'channel_message'  => Icons.groups_outlined,
+        'community_message'=> Icons.groups_outlined,
+        'support'          => Icons.support_agent_rounded,
         _                  => Icons.notifications_outlined,
       };
 }
