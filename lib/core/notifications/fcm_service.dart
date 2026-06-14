@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/auth/repositories/auth_repository.dart';
+import 'pending_route.dart';
 
 // Handler background — OBLIGATOIREMENT top-level (hors de toute classe)
 // Le compilateur release le conserve grâce à @pragma
@@ -46,12 +47,14 @@ class FcmService {
       _navigateFromData(message.data);
     });
 
-    // TERMINÉE — app fermée, utilisateur tape la notification
+    // TERMINÉE — app fermée, utilisateur tape la notification.
+    // On ne peut pas naviguer ici (BuildContext pas encore prêt).
+    // On stocke la route dans PendingRoute ; la SplashScreen la consomme
+    // après avoir terminé sa propre redirection.
     FirebaseMessaging.instance.getInitialMessage().then((message) {
       if (message != null) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          _navigateFromData(message.data);
-        });
+        final route = _routeForData(message.data);
+        if (route != null) PendingRoute.set(route);
       }
     });
   }
@@ -138,41 +141,53 @@ class FcmService {
 
   // ─── Navigation ────────────────────────────────────────────────────────────
 
-  static void _navigateFromData(Map<String, dynamic> data) {
-    final ctx = navigatorKey.currentContext;
-    if (ctx == null || !ctx.mounted) return;
-
+  /// Calcule la route Flutter à partir du payload FCM.
+  /// Retourne null si aucune destination spécifique (→ /home par défaut).
+  static String? _routeForData(Map<String, dynamic> data) {
     final type = data['type'] as String? ?? '';
-
     switch (type) {
       case 'new_order':
       case 'order_status':
       case 'payment_verified':
         final id = int.tryParse(data['order_id']?.toString() ?? '');
-        if (id != null) ctx.push('/orders/$id');
+        return id != null ? '/orders/$id' : null;
 
       case 'new_product':
         final slug = data['slug'] as String? ?? '';
-        if (slug.isNotEmpty) ctx.push('/products/$slug');
+        return slug.isNotEmpty ? '/products/$slug' : null;
 
       case 'new_order_admin':
       case 'proof_submitted':
         final id = int.tryParse(data['order_id']?.toString() ?? '');
-        if (id != null) ctx.push('/admin/orders/$id');
+        return id != null ? '/admin/orders/$id' : null;
 
-      // ── Communauté ──────────────────────────────────────────────────────────
       case 'reply':
       case 'mention':
       case 'channel_message':
       case 'community_message':
-        ctx.go('/community');
+        return '/community';
 
-      // ── Support privé ────────────────────────────────────────────────────────
       case 'support':
-        ctx.push('/community/support');
+        return '/community/support';
 
       default:
-        ctx.go('/home');
+        return null;
+    }
+  }
+
+  static void _navigateFromData(Map<String, dynamic> data) {
+    final ctx = navigatorKey.currentContext;
+    if (ctx == null || !ctx.mounted) return;
+
+    final route = _routeForData(data);
+    if (route == null) { ctx.go('/home'); return; }
+
+    // Les écrans de liste (tabs) → go() pour remplacer la stack.
+    // Les écrans détail (orders, products, support) → push() pour garder le retour.
+    if (route == '/community' || route == '/home') {
+      ctx.go(route);
+    } else {
+      ctx.push(route);
     }
   }
 

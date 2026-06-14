@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/notifications/pending_route.dart';
 import '../../../core/theme/app_colors.dart';
 import '../providers/auth_provider.dart';
 
@@ -27,6 +28,13 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     if (!auth.isLoading) {
       _navigated = true;
       context.go('/home');
+      // Consomme la route stockée lors d'un tap notif app-fermée.
+      final pending = PendingRoute.consume();
+      if (pending != null) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) context.push(pending);
+        });
+      }
     }
   }
 
