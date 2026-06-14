@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../features/auth/providers/auth_provider.dart';
+import '../../../shared/widgets/full_screen_image_viewer.dart';
 import '../models/community_message.dart';
 import '../providers/community_provider.dart';
 
@@ -501,7 +503,25 @@ class _MessageBubble extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isOwn = message.isOwn;
-    return Padding(
+    return Dismissible(
+      key: ValueKey('reply_${message.id}'),
+      direction: DismissDirection.startToEnd,
+      confirmDismiss: (_) async {
+        onReply(message);
+        return false;
+      },
+      background: Align(
+        alignment: Alignment.centerLeft,
+        child: Padding(
+          padding: const EdgeInsets.only(left: 16),
+          child: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(color: _kAccent.withValues(alpha: 0.15), shape: BoxShape.circle),
+            child: const Icon(Icons.reply_rounded, color: _kAccent, size: 20),
+          ),
+        ),
+      ),
+      child: Padding(
       padding: const EdgeInsets.symmetric(vertical: 3),
       child: Row(
         mainAxisAlignment: isOwn ? MainAxisAlignment.end : MainAxisAlignment.start,
@@ -621,7 +641,7 @@ class _MessageBubble extends ConsumerWidget {
           ],
         ],
       ),
-    );
+    )); // Padding + Dismissible
   }
 
   void _showActions(BuildContext context) {
@@ -702,7 +722,7 @@ class _AttachmentGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (urls.length == 1) {
-      return _AttachmentImg(url: urls[0]);
+      return _AttachmentImg(url: urls[0], allUrls: urls, index: 0);
     }
     return GridView.builder(
       shrinkWrap: true,
@@ -710,22 +730,27 @@ class _AttachmentGrid extends StatelessWidget {
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2, mainAxisSpacing: 4, crossAxisSpacing: 4, childAspectRatio: 1),
       itemCount: urls.length.clamp(0, 4),
-      itemBuilder: (_, i) => _AttachmentImg(url: urls[i]),
+      itemBuilder: (_, i) => _AttachmentImg(url: urls[i], allUrls: urls, index: i),
     );
   }
 }
 
 class _AttachmentImg extends StatelessWidget {
   final String url;
-  const _AttachmentImg({required this.url});
+  final List<String> allUrls;
+  final int index;
+  const _AttachmentImg({required this.url, required this.allUrls, required this.index});
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(8),
-      child: CachedNetworkImage(
-        imageUrl: url, fit: BoxFit.cover,
-        errorWidget: (_, __, ___) => const Icon(Icons.broken_image),
+    return GestureDetector(
+      onTap: () => FullScreenImageViewer.show(context, allUrls, initialIndex: index),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: CachedNetworkImage(
+          imageUrl: url, fit: BoxFit.cover,
+          errorWidget: (_, __, ___) => const Icon(Icons.broken_image),
+        ),
       ),
     );
   }
@@ -835,7 +860,7 @@ class _ImagePreviews extends StatelessWidget {
             margin: const EdgeInsets.only(right: 8),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
-              image: DecorationImage(image: NetworkImage(images[i].path), fit: BoxFit.cover),
+              image: DecorationImage(image: FileImage(File(images[i].path)), fit: BoxFit.cover),
             ),
           ),
           Positioned(

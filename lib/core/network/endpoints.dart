@@ -91,9 +91,10 @@ class Endpoints {
   static String communityMute(int pk)                => '/community/messages/$pk/mute-author/';
   static const String communityNotifications         = '/community/notifications/';
   static const String communityUsersSearch           = '/community/users/search/';
-  static const String communitySupport               = '/community/support/messages/';
-  static const String communitySupportInbox          = '/community/support/inbox/';
-  static String communitySupportConversation(int id) => '/community/support/inbox/$id/messages/';
+  static const String communitySupport                   = '/community/support/messages/';
+  static const String communitySupportInbox              = '/community/support/inbox/';
+  static String communitySupportConversationFeed(int id) => '/community/support/inbox/$id/messages/';
+  static String communitySupportConversationPost(int id) => '/community/support/inbox/$id/messages/';
 
   // Routes publiques (pas d'injection du token)
   static const List<String> publicRoutes = [

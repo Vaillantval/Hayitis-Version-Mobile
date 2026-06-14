@@ -1,4 +1,9 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:dio/dio.dart';
+import '../../../shared/widgets/full_screen_image_viewer.dart';
+import 'package:emoji_picker_flutter/emoji_picker_flutter.dart' as ep;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -89,6 +94,9 @@ class _ClientSupportViewState extends ConsumerState<_ClientSupportView> {
   final _picker     = ImagePicker();
   final List<XFile> _pendingImages = [];
   bool _autoScroll  = true;
+  int?    _replyToId;
+  String? _replyAuthor;
+  String? _replySnippet;
 
   @override
   void dispose() {
@@ -175,42 +183,31 @@ class _ClientSupportViewState extends ConsumerState<_ClientSupportView> {
                 controller: _scrollCtrl,
                 padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
                 itemCount: feed.messages.length,
-                itemBuilder: (_, i) => _DMBubble(msg: feed.messages[i]),
+                itemBuilder: (_, i) => _DMBubble(
+                  msg: feed.messages[i],
+                  onReply: (m) => setState(() {
+                    _replyToId     = m.id;
+                    _replyAuthor   = m.isAdmin ? "Support Hayiti's" : 'Moi';
+                    _replySnippet  = m.content.isNotEmpty ? m.content : '📷 image';
+                  }),
+                ),
               );
             },
           ),
         ),
 
-        // Image previews
-        if (_pendingImages.isNotEmpty)
-          Container(
-            color: Colors.white, height: 80,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.all(8),
-              itemCount: _pendingImages.length,
-              itemBuilder: (_, i) => Stack(children: [
-                Container(
-                  width: 64, height: 64, margin: const EdgeInsets.only(right: 8),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    image: DecorationImage(image: NetworkImage(_pendingImages[i].path), fit: BoxFit.cover),
-                  ),
-                ),
-                Positioned(top: 0, right: 4,
-                  child: GestureDetector(
-                    onTap: () => setState(() => _pendingImages.removeAt(i)),
-                    child: Container(
-                      width: 18, height: 18,
-                      decoration: const BoxDecoration(color: Colors.black54, shape: BoxShape.circle),
-                      child: const Icon(Icons.close, size: 12, color: Colors.white),
-                    ),
-                  )),
-              ]),
-            ),
+        if (_replyToId != null)
+          _SupportReplyBar(
+            author: _replyAuthor ?? '',
+            snippet: _replySnippet ?? '',
+            onCancel: () => setState(() { _replyToId = null; _replyAuthor = null; _replySnippet = null; }),
           ),
 
-        // Composer
+        _ImagePreviewStrip(
+          images: _pendingImages,
+          onRemove: (i) => setState(() => _pendingImages.removeAt(i)),
+        ),
+
         _SupportComposer(
           textCtrl: _textCtrl,
           onSend: _send,
@@ -304,6 +301,8 @@ class _ConversationTile extends ConsumerWidget {
   }
 }
 
+// ── Admin conversation view ───────────────────────────────────────────────────
+
 class _AdminConversationView extends ConsumerStatefulWidget {
   final SupportConversation conv;
   const _AdminConversationView({required this.conv});
@@ -315,9 +314,14 @@ class _AdminConversationView extends ConsumerStatefulWidget {
 class _AdminConversationViewState extends ConsumerState<_AdminConversationView> {
   final _textCtrl   = TextEditingController();
   final _scrollCtrl = ScrollController();
+  final _picker     = ImagePicker();
+  final List<XFile> _pendingImages = [];
   List<DirectMessage> _messages = [];
   bool _loading = true;
   bool _sending = false;
+  int?    _replyToId;
+  String? _replyAuthor;
+  String? _replySnippet;
 
   @override
   void initState() {
@@ -342,18 +346,27 @@ class _AdminConversationViewState extends ConsumerState<_AdminConversationView> 
     }
   }
 
+  Future<void> _pickImage() async {
+    final files = await _picker.pickMultiImage(imageQuality: 80, limit: 3);
+    if (files.isNotEmpty) setState(() => _pendingImages.addAll(files));
+  }
+
   Future<void> _send() async {
     final text = _textCtrl.text.trim();
-    if (text.isEmpty) return;
+    if (text.isEmpty && _pendingImages.isEmpty) return;
+    final images = List<XFile>.from(_pendingImages);
     _textCtrl.clear();
-    setState(() => _sending = true);
+    setState(() { _pendingImages.clear(); _sending = true; });
     try {
+      final multiparts = await Future.wait(
+        images.map((f) => MultipartFile.fromFile(f.path, filename: f.name)),
+      );
       final msg = await ref.read(communityRepositoryProvider)
-          .postConversationMessage(widget.conv.id, text);
-      setState(() { _messages.add(msg); _sending = false; });
+          .postConversationMessage(widget.conv.id, text, images: multiparts);
+      if (mounted) setState(() { _messages.add(msg); _sending = false; });
       WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
     } catch (_) {
-      setState(() => _sending = false);
+      if (mounted) setState(() => _sending = false);
     }
   }
 
@@ -375,10 +388,33 @@ class _AdminConversationViewState extends ConsumerState<_AdminConversationView> 
                 controller: _scrollCtrl,
                 padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
                 itemCount: _messages.length,
-                itemBuilder: (_, i) => _DMBubble(msg: _messages[i], adminView: true),
+                itemBuilder: (_, i) => _DMBubble(
+                  msg: _messages[i],
+                  adminView: true,
+                  onReply: (m) => setState(() {
+                    _replyToId     = m.id;
+                    _replyAuthor   = m.isAdmin ? 'Moi' : widget.conv.clientName;
+                    _replySnippet  = m.content.isNotEmpty ? m.content : '📷 image';
+                  }),
+                ),
               ),
         ),
-        _SupportComposer(textCtrl: _textCtrl, onSend: _send, isSending: _sending),
+        if (_replyToId != null)
+          _SupportReplyBar(
+            author: _replyAuthor ?? '',
+            snippet: _replySnippet ?? '',
+            onCancel: () => setState(() { _replyToId = null; _replyAuthor = null; _replySnippet = null; }),
+          ),
+        _ImagePreviewStrip(
+          images: _pendingImages,
+          onRemove: (i) => setState(() => _pendingImages.removeAt(i)),
+        ),
+        _SupportComposer(
+          textCtrl: _textCtrl,
+          onSend: _send,
+          onPickImage: _pickImage,
+          isSending: _sending,
+        ),
       ]),
     );
   }
@@ -393,16 +429,195 @@ class _AdminConversationViewState extends ConsumerState<_AdminConversationView> 
 
 // ── Shared widgets ────────────────────────────────────────────────────────────
 
+class _ImagePreviewStrip extends StatelessWidget {
+  final List<XFile> images;
+  final ValueChanged<int> onRemove;
+  const _ImagePreviewStrip({required this.images, required this.onRemove});
+
+  @override
+  Widget build(BuildContext context) {
+    if (images.isEmpty) return const SizedBox.shrink();
+    return Container(
+      color: Colors.white, height: 84,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.all(10),
+        itemCount: images.length,
+        itemBuilder: (_, i) => Stack(children: [
+          Container(
+            width: 64, height: 64, margin: const EdgeInsets.only(right: 8),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              image: DecorationImage(
+                image: FileImage(File(images[i].path)),
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          Positioned(top: 0, right: 4,
+            child: GestureDetector(
+              onTap: () => onRemove(i),
+              child: Container(
+                width: 18, height: 18,
+                decoration: const BoxDecoration(color: Colors.black54, shape: BoxShape.circle),
+                child: const Icon(Icons.close, size: 12, color: Colors.white),
+              ),
+            )),
+        ]),
+      ),
+    );
+  }
+}
+
+class _SupportComposer extends StatefulWidget {
+  final TextEditingController textCtrl;
+  final VoidCallback onSend;
+  final VoidCallback? onPickImage;
+  final bool isSending;
+
+  const _SupportComposer({
+    required this.textCtrl,
+    required this.onSend,
+    this.onPickImage,
+    required this.isSending,
+  });
+
+  @override
+  State<_SupportComposer> createState() => _SupportComposerState();
+}
+
+class _SupportComposerState extends State<_SupportComposer> {
+  bool _showEmoji = false;
+  final _focusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode.addListener(() {
+      if (_focusNode.hasFocus && _showEmoji) {
+        setState(() => _showEmoji = false);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  void _toggleEmoji() {
+    if (_showEmoji) {
+      _focusNode.requestFocus();
+      setState(() => _showEmoji = false);
+    } else {
+      _focusNode.unfocus();
+      setState(() => _showEmoji = true);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(mainAxisSize: MainAxisSize.min, children: [
+      Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border(top: BorderSide(color: AppColors.cardBorder)),
+        ),
+        padding: const EdgeInsets.fromLTRB(4, 6, 8, 8),
+        child: Row(children: [
+          // Emoji button
+          IconButton(
+            icon: Icon(
+              _showEmoji ? Icons.keyboard_rounded : Icons.emoji_emotions_outlined,
+              color: _showEmoji ? _kAccent : AppColors.textMuted,
+            ),
+            onPressed: _toggleEmoji,
+            tooltip: 'Emoji',
+          ),
+          // Image button
+          if (widget.onPickImage != null)
+            IconButton(
+              icon: const Icon(Icons.image_outlined, color: AppColors.textMuted),
+              onPressed: widget.onPickImage,
+              tooltip: 'Image',
+            ),
+          // Text field
+          Expanded(
+            child: TextField(
+              controller: widget.textCtrl,
+              focusNode: _focusNode,
+              maxLines: null, minLines: 1, maxLength: 2000,
+              decoration: InputDecoration(
+                hintText: 'Votre message...',
+                hintStyle: GoogleFonts.nunito(color: AppColors.textMuted, fontSize: 14),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(22), borderSide: BorderSide.none),
+                filled: true, fillColor: AppColors.background,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                counterText: '',
+              ),
+              style: GoogleFonts.nunito(fontSize: 14, color: AppColors.dark),
+            ),
+          ),
+          const SizedBox(width: 6),
+          // Send button
+          GestureDetector(
+            onTap: widget.isSending ? null : widget.onSend,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              width: 42, height: 42,
+              decoration: BoxDecoration(
+                color: widget.isSending ? AppColors.textMuted : _kAccent,
+                shape: BoxShape.circle,
+              ),
+              child: widget.isSending
+                ? const Center(child: SizedBox(width: 18, height: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)))
+                : const Icon(Icons.send_rounded, color: Colors.white, size: 20),
+            ),
+          ),
+        ]),
+      ),
+      // Emoji panel
+      if (_showEmoji)
+        SizedBox(
+          height: 256,
+          child: ep.EmojiPicker(
+            textEditingController: widget.textCtrl,
+            config: ep.Config(
+              height: 256,
+              emojiViewConfig: ep.EmojiViewConfig(
+                columns: 8,
+                emojiSizeMax: 28,
+                backgroundColor: Colors.white,
+                noRecents: Text('Aucun récent',
+                  style: GoogleFonts.nunito(color: AppColors.textMuted, fontSize: 12)),
+              ),
+              categoryViewConfig: ep.CategoryViewConfig(
+                indicatorColor: _kAccent,
+                iconColor: AppColors.textMuted,
+                iconColorSelected: _kAccent,
+                backgroundColor: Colors.white,
+              ),
+              bottomActionBarConfig: const ep.BottomActionBarConfig(enabled: false),
+            ),
+          ),
+        ),
+    ]);
+  }
+}
+
 class _DMBubble extends StatelessWidget {
   final DirectMessage msg;
   final bool adminView;
-  const _DMBubble({required this.msg, this.adminView = false});
+  final void Function(DirectMessage)? onReply;
+  const _DMBubble({required this.msg, this.adminView = false, this.onReply});
 
   bool get _isRight => msg.isOwn;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    final bubble = Padding(
       padding: const EdgeInsets.symmetric(vertical: 3),
       child: Row(
         mainAxisAlignment: _isRight ? MainAxisAlignment.end : MainAxisAlignment.start,
@@ -411,7 +626,7 @@ class _DMBubble extends StatelessWidget {
           if (!_isRight) ...[
             CircleAvatar(
               radius: 14,
-              backgroundColor: _isRight ? _kAccent : AppColors.dark,
+              backgroundColor: AppColors.dark,
               child: const Icon(Icons.support_agent_rounded, size: 16, color: Colors.white),
             ),
             const SizedBox(width: 6),
@@ -436,11 +651,14 @@ class _DMBubble extends StatelessWidget {
                     style: GoogleFonts.nunito(fontSize: 14, color: _isRight ? Colors.white : AppColors.dark, height: 1.4)),
                 if (msg.attachments.isNotEmpty) ...[
                   const SizedBox(height: 6),
-                  ...msg.attachments.map((url) => Padding(
-                    padding: const EdgeInsets.only(top: 4),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: CachedNetworkImage(imageUrl: url, width: 180, fit: BoxFit.cover),
+                  ...msg.attachments.asMap().entries.map((e) => GestureDetector(
+                    onTap: () => FullScreenImageViewer.show(context, msg.attachments, initialIndex: e.key),
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: CachedNetworkImage(imageUrl: e.value, width: 180, fit: BoxFit.cover),
+                      ),
                     ),
                   )),
                 ],
@@ -454,6 +672,29 @@ class _DMBubble extends StatelessWidget {
         ],
       ),
     );
+
+    if (onReply == null) return bubble;
+
+    return Dismissible(
+      key: ValueKey('dm_reply_${msg.id}'),
+      direction: DismissDirection.startToEnd,
+      confirmDismiss: (_) async {
+        onReply!(msg);
+        return false;
+      },
+      background: Align(
+        alignment: Alignment.centerLeft,
+        child: Padding(
+          padding: const EdgeInsets.only(left: 16),
+          child: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(color: _kAccent.withValues(alpha: 0.15), shape: BoxShape.circle),
+            child: const Icon(Icons.reply_rounded, color: _kAccent, size: 20),
+          ),
+        ),
+      ),
+      child: bubble,
+    );
   }
 
   String _fmtTime(DateTime dt) {
@@ -462,63 +703,33 @@ class _DMBubble extends StatelessWidget {
   }
 }
 
-class _SupportComposer extends StatelessWidget {
-  final TextEditingController textCtrl;
-  final VoidCallback onSend;
-  final VoidCallback? onPickImage;
-  final bool isSending;
-
-  const _SupportComposer({
-    required this.textCtrl,
-    required this.onSend,
-    this.onPickImage,
-    required this.isSending,
-  });
+class _SupportReplyBar extends StatelessWidget {
+  final String author;
+  final String snippet;
+  final VoidCallback onCancel;
+  const _SupportReplyBar({required this.author, required this.snippet, required this.onCancel});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: AppColors.cardBorder)),
-      ),
-      padding: const EdgeInsets.fromLTRB(8, 6, 8, 8),
+      color: _kAccent.withValues(alpha: 0.08),
+      padding: const EdgeInsets.fromLTRB(16, 6, 8, 6),
       child: Row(children: [
-        if (onPickImage != null)
-          IconButton(
-            icon: const Icon(Icons.image_outlined, color: AppColors.textMuted),
-            onPressed: onPickImage,
-          ),
+        Container(width: 3, height: 36,
+          decoration: BoxDecoration(color: _kAccent, borderRadius: BorderRadius.circular(2))),
+        const SizedBox(width: 8),
         Expanded(
-          child: TextField(
-            controller: textCtrl,
-            maxLines: null, minLines: 1, maxLength: 2000,
-            decoration: InputDecoration(
-              hintText: 'Votre message...',
-              hintStyle: GoogleFonts.nunito(color: AppColors.textMuted, fontSize: 14),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(22), borderSide: BorderSide.none),
-              filled: true, fillColor: AppColors.background,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-              counterText: '',
-            ),
-            style: GoogleFonts.nunito(fontSize: 14, color: AppColors.dark),
-          ),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+            Text('Répondre à $author',
+              style: GoogleFonts.nunito(fontSize: 11, fontWeight: FontWeight.w700, color: _kAccent)),
+            Text(snippet, maxLines: 1, overflow: TextOverflow.ellipsis,
+              style: GoogleFonts.nunito(fontSize: 11, color: AppColors.textMuted)),
+          ]),
         ),
-        const SizedBox(width: 6),
-        GestureDetector(
-          onTap: isSending ? null : onSend,
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            width: 42, height: 42,
-            decoration: BoxDecoration(
-              color: isSending ? AppColors.textMuted : _kAccent,
-              shape: BoxShape.circle,
-            ),
-            child: isSending
-              ? const Center(child: SizedBox(width: 18, height: 18,
-                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)))
-              : const Icon(Icons.send_rounded, color: Colors.white, size: 20),
-          ),
+        IconButton(
+          icon: const Icon(Icons.close, size: 18, color: AppColors.textMuted),
+          onPressed: onCancel,
+          padding: EdgeInsets.zero,
         ),
       ]),
     );

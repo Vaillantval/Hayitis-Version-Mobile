@@ -9,12 +9,15 @@ import '../models/community_notification.dart';
 import '../models/direct_message.dart';
 
 // Safely extracts a List from any API response shape:
-// { "results": [...] }, { "data": [...] }, { "data": {"results": [...]} }, or raw [...]
+// { "results": [...] }, { "data": [...] }, { "data": {"results": [...]} },
+// { "messages": [...] }, or raw [...]
 List<dynamic> _extractList(dynamic data) {
   if (data is List) return data;
   if (data is Map<String, dynamic>) {
     final r = data['results'];
     if (r is List) return r;
+    final m = data['messages'];
+    if (m is List) return m;
     final d = data['data'];
     if (d is List) return d;
     if (d is Map<String, dynamic>) {
@@ -23,6 +26,11 @@ List<dynamic> _extractList(dynamic data) {
     }
   }
   return [];
+}
+
+ApiException _toApiException(DioException e) {
+  final d = e.response?.data;
+  return ApiException.fromJson(d is Map<String, dynamic> ? d : {}, statusCode: e.response?.statusCode);
 }
 
 class CommunityRepository {
@@ -35,7 +43,7 @@ class CommunityRepository {
           .map((e) => Channel.fromJson(e as Map<String, dynamic>))
           .toList();
     } on DioException catch (e) {
-      throw ApiException.fromJson(e.response?.data as Map<String, dynamic>? ?? {}, statusCode: e.response?.statusCode);
+      throw _toApiException(e);
     }
   }
 
@@ -52,7 +60,7 @@ class CommunityRepository {
           .map((e) => CommunityMessage.fromJson(e as Map<String, dynamic>))
           .toList();
     } on DioException catch (e) {
-      throw ApiException.fromJson(e.response?.data as Map<String, dynamic>? ?? {}, statusCode: e.response?.statusCode);
+      throw _toApiException(e);
     }
   }
 
@@ -75,7 +83,7 @@ class CommunityRepository {
           : root;
       return CommunityMessage.fromJson(msgData as Map<String, dynamic>);
     } on DioException catch (e) {
-      throw ApiException.fromJson(e.response?.data as Map<String, dynamic>? ?? {}, statusCode: e.response?.statusCode);
+      throw _toApiException(e);
     }
   }
 
@@ -84,7 +92,7 @@ class CommunityRepository {
       final r = await _dio.post(Endpoints.communityReact(pk), data: {'emoji': emoji});
       return r.data as Map<String, dynamic>? ?? {};
     } on DioException catch (e) {
-      throw ApiException.fromJson(e.response?.data as Map<String, dynamic>? ?? {}, statusCode: e.response?.statusCode);
+      throw _toApiException(e);
     }
   }
 
@@ -92,7 +100,7 @@ class CommunityRepository {
     try {
       await _dio.delete(Endpoints.communityMessageAction(pk));
     } on DioException catch (e) {
-      throw ApiException.fromJson(e.response?.data as Map<String, dynamic>? ?? {}, statusCode: e.response?.statusCode);
+      throw _toApiException(e);
     }
   }
 
@@ -100,7 +108,7 @@ class CommunityRepository {
     try {
       await _dio.post(Endpoints.communityMessageAction(pk));
     } on DioException catch (e) {
-      throw ApiException.fromJson(e.response?.data as Map<String, dynamic>? ?? {}, statusCode: e.response?.statusCode);
+      throw _toApiException(e);
     }
   }
 
@@ -110,7 +118,7 @@ class CommunityRepository {
       final root = r.data as Map<String, dynamic>? ?? {};
       return root['following'] as bool? ?? false;
     } on DioException catch (e) {
-      throw ApiException.fromJson(e.response?.data as Map<String, dynamic>? ?? {}, statusCode: e.response?.statusCode);
+      throw _toApiException(e);
     }
   }
 
@@ -124,7 +132,7 @@ class CommunityRepository {
         unreadCount: root['unread_count'] as int? ?? 0,
       );
     } on DioException catch (e) {
-      throw ApiException.fromJson(e.response?.data as Map<String, dynamic>? ?? {}, statusCode: e.response?.statusCode);
+      throw _toApiException(e);
     }
   }
 
@@ -133,7 +141,7 @@ class CommunityRepository {
       await _dio.post(Endpoints.communityNotifications,
           data: ids != null ? {'ids': ids} : {'all': true});
     } on DioException catch (e) {
-      throw ApiException.fromJson(e.response?.data as Map<String, dynamic>? ?? {}, statusCode: e.response?.statusCode);
+      throw _toApiException(e);
     }
   }
 
@@ -152,7 +160,7 @@ class CommunityRepository {
           .map((e) => DirectMessage.fromJson(e as Map<String, dynamic>))
           .toList();
     } on DioException catch (e) {
-      throw ApiException.fromJson(e.response?.data as Map<String, dynamic>? ?? {}, statusCode: e.response?.statusCode);
+      throw _toApiException(e);
     }
   }
 
@@ -164,9 +172,11 @@ class CommunityRepository {
       });
       final r = await _dio.post(Endpoints.communitySupport, data: formData);
       final root = r.data as Map<String, dynamic>? ?? {};
-      return DirectMessage.fromJson((root['data'] as Map<String, dynamic>?) ?? root);
+      return DirectMessage.fromJson(
+          (root['message'] as Map<String, dynamic>?) ??
+          (root['data']    as Map<String, dynamic>?) ?? root);
     } on DioException catch (e) {
-      throw ApiException.fromJson(e.response?.data as Map<String, dynamic>? ?? {}, statusCode: e.response?.statusCode);
+      throw _toApiException(e);
     }
   }
 
@@ -177,7 +187,7 @@ class CommunityRepository {
           .map((e) => SupportConversation.fromJson(e as Map<String, dynamic>))
           .toList();
     } on DioException catch (e) {
-      throw ApiException.fromJson(e.response?.data as Map<String, dynamic>? ?? {}, statusCode: e.response?.statusCode);
+      throw _toApiException(e);
     }
   }
 
@@ -185,14 +195,14 @@ class CommunityRepository {
     try {
       final params = after != null ? {'after': after} : null;
       final r = await _dio.get(
-        Endpoints.communitySupportConversation(convId),
+        Endpoints.communitySupportConversationFeed(convId),
         queryParameters: params,
       );
       return _extractList(r.data)
           .map((e) => DirectMessage.fromJson(e as Map<String, dynamic>))
           .toList();
     } on DioException catch (e) {
-      throw ApiException.fromJson(e.response?.data as Map<String, dynamic>? ?? {}, statusCode: e.response?.statusCode);
+      throw _toApiException(e);
     }
   }
 
@@ -202,11 +212,13 @@ class CommunityRepository {
         'content': content,
         if (images != null && images.isNotEmpty) 'images': images,
       });
-      final r = await _dio.post(Endpoints.communitySupportConversation(convId), data: formData);
+      final r = await _dio.post(Endpoints.communitySupportConversationPost(convId), data: formData);
       final root = r.data as Map<String, dynamic>? ?? {};
-      return DirectMessage.fromJson((root['data'] as Map<String, dynamic>?) ?? root);
+      return DirectMessage.fromJson(
+          (root['message'] as Map<String, dynamic>?) ??
+          (root['data']    as Map<String, dynamic>?) ?? root);
     } on DioException catch (e) {
-      throw ApiException.fromJson(e.response?.data as Map<String, dynamic>? ?? {}, statusCode: e.response?.statusCode);
+      throw _toApiException(e);
     }
   }
 }
