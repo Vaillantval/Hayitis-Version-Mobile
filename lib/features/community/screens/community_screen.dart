@@ -178,11 +178,14 @@ class _CommunityAppBar extends ConsumerWidget implements PreferredSizeWidget {
             child: const Icon(Icons.notifications_outlined, color: Colors.white),
           ),
         ),
-        // Support
+        // Support / Inbox admin
         IconButton(
           onPressed: () => context.push('/community/support'),
-          icon: const Icon(Icons.support_agent_rounded, color: Colors.white),
-          tooltip: 'Support',
+          icon: Icon(
+            isStaff ? Icons.inbox_outlined : Icons.support_agent_rounded,
+            color: Colors.white,
+          ),
+          tooltip: isStaff ? 'Boîte de support' : 'Contacter le support',
         ),
       ],
     );

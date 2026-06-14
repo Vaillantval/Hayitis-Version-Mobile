@@ -23,6 +23,8 @@ class _AdminShellScreenState extends State<AdminShellScreen> {
     if (location.startsWith('/admin/categories')) return 4;
     if (location.startsWith('/admin/inventory'))  return 5;
     if (location.startsWith('/admin/reports'))    return 6;
+    if (location == '/community/support')         return 7;
+    if (location.startsWith('/community'))        return 8;
     return 0;
   }
 
@@ -45,6 +47,8 @@ class _AdminShellScreenState extends State<AdminShellScreen> {
             case 4: context.go('/admin/categories');  break;
             case 5: context.go('/admin/inventory');   break;
             case 6: context.go('/admin/reports');     break;
+            case 7: context.go('/community/support'); break;
+            case 8: context.go('/community');         break;
           }
         },
         children: [
@@ -82,6 +86,13 @@ class _AdminShellScreenState extends State<AdminShellScreen> {
           const NavigationDrawerDestination(icon: Icon(Icons.category_outlined),     selectedIcon: Icon(Icons.category),     label: Text('Catégories')),
           const NavigationDrawerDestination(icon: Icon(Icons.warehouse_outlined),    selectedIcon: Icon(Icons.warehouse),    label: Text('Inventaire')),
           const NavigationDrawerDestination(icon: Icon(Icons.bar_chart_outlined),    selectedIcon: Icon(Icons.bar_chart),    label: Text('Rapports')),
+          const Divider(height: 1),
+          const Padding(
+            padding: EdgeInsets.fromLTRB(28, 8, 16, 4),
+            child: Text('Communauté', style: TextStyle(fontFamily: 'Poppins', fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.textMuted)),
+          ),
+          const NavigationDrawerDestination(icon: Icon(Icons.inbox_outlined),        selectedIcon: Icon(Icons.inbox),        label: Text('Boîte de support')),
+          const NavigationDrawerDestination(icon: Icon(Icons.groups_outlined),       selectedIcon: Icon(Icons.groups),       label: Text('Communauté')),
         ],
       ),
     );

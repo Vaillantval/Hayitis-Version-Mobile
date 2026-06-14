@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../features/auth/providers/auth_provider.dart';
 import '../../features/cart/providers/cart_provider.dart';
 import '../theme/app_colors.dart';
 
@@ -22,15 +23,16 @@ class MainShell extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final cartCount  = ref.watch(cartCountProvider);
+    final isStaff    = ref.watch(authProvider).profile?.isStaff ?? false;
     final index      = _selectedIndex(context);
     final location   = GoRouterState.of(context).matchedLocation;
-    final onSupport  = location == '/community/support';
+    final hideFab    = isStaff || location.startsWith('/community');
 
     return Scaffold(
       body: child,
 
       // ── FAB Contact admin ──────────────────────────────────────────────
-      floatingActionButton: onSupport ? null : _SupportFab(),
+      floatingActionButton: hideFab ? null : _SupportFab(),
 
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: index,

@@ -111,7 +111,8 @@ class ProfileScreen extends ConsumerWidget {
             _MenuSection(title: 'Mes achats', items: [
               _MenuItem(Icons.receipt_long_outlined, 'Mes commandes', () => context.push('/orders')),
               _MenuItem(Icons.favorite_outline, 'Mes favoris', () => context.go('/wishlist')),
-              _MenuItem(Icons.support_agent_outlined, 'Contacter le support', () => context.push('/chat')),
+              if (profile?.isStaff != true)
+                _MenuItem(Icons.support_agent_outlined, 'Contacter le support', () => context.push('/community/support')),
             ]),
             const SizedBox(height: 12),
             _MenuSection(title: 'Mon compte', items: [
@@ -129,6 +130,7 @@ class ProfileScreen extends ConsumerWidget {
               const SizedBox(height: 12),
               _MenuSection(title: 'Administration', items: [
                 _MenuItem(Icons.admin_panel_settings_outlined, 'Back Office', () => context.push('/admin/dashboard'), color: AppColors.primary),
+                _MenuItem(Icons.inbox_outlined, 'Boîte de support', () => context.push('/community/support'), color: AppColors.primary),
               ]),
             ],
             const SizedBox(height: 12),
