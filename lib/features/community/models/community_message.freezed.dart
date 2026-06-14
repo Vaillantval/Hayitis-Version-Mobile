@@ -25,7 +25,7 @@ mixin _$MsgProduct {
   String get name => throw _privateConstructorUsedError;
   String get slug => throw _privateConstructorUsedError;
   String get image => throw _privateConstructorUsedError;
-  double get price => throw _privateConstructorUsedError;
+  String get price => throw _privateConstructorUsedError;
 
   /// Serializes this MsgProduct to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -44,7 +44,7 @@ abstract class $MsgProductCopyWith<$Res> {
     $Res Function(MsgProduct) then,
   ) = _$MsgProductCopyWithImpl<$Res, MsgProduct>;
   @useResult
-  $Res call({int id, String name, String slug, String image, double price});
+  $Res call({int id, String name, String slug, String image, String price});
 }
 
 /// @nodoc
@@ -94,7 +94,7 @@ class _$MsgProductCopyWithImpl<$Res, $Val extends MsgProduct>
                 null == price
                     ? _value.price
                     : price // ignore: cast_nullable_to_non_nullable
-                        as double,
+                        as String,
           )
           as $Val,
     );
@@ -110,7 +110,7 @@ abstract class _$$MsgProductImplCopyWith<$Res>
   ) = __$$MsgProductImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({int id, String name, String slug, String image, double price});
+  $Res call({int id, String name, String slug, String image, String price});
 }
 
 /// @nodoc
@@ -159,7 +159,7 @@ class __$$MsgProductImplCopyWithImpl<$Res>
             null == price
                 ? _value.price
                 : price // ignore: cast_nullable_to_non_nullable
-                    as double,
+                    as String,
       ),
     );
   }
@@ -173,7 +173,7 @@ class _$MsgProductImpl implements _MsgProduct {
     this.name = '',
     this.slug = '',
     this.image = '',
-    this.price = 0.0,
+    this.price = '',
   });
 
   factory _$MsgProductImpl.fromJson(Map<String, dynamic> json) =>
@@ -192,7 +192,7 @@ class _$MsgProductImpl implements _MsgProduct {
   final String image;
   @override
   @JsonKey()
-  final double price;
+  final String price;
 
   @override
   String toString() {
@@ -235,7 +235,7 @@ abstract class _MsgProduct implements MsgProduct {
     final String name,
     final String slug,
     final String image,
-    final double price,
+    final String price,
   }) = _$MsgProductImpl;
 
   factory _MsgProduct.fromJson(Map<String, dynamic> json) =
@@ -250,7 +250,7 @@ abstract class _MsgProduct implements MsgProduct {
   @override
   String get image;
   @override
-  double get price;
+  String get price;
 
   /// Create a copy of MsgProduct
   /// with the given fields replaced by the non-null parameter values.

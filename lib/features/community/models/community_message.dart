@@ -9,7 +9,7 @@ class MsgProduct with _$MsgProduct {
     @Default('') String name,
     @Default('') String slug,
     @Default('') String image,
-    @Default(0.0) double price,
+    @Default('') String price,
   }) = _MsgProduct;
   factory MsgProduct.fromJson(Map<String, dynamic> json) => _$MsgProductFromJson(json);
 }

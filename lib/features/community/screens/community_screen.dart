@@ -762,7 +762,7 @@ class _ProductCard extends StatelessWidget {
                 Text(product.name, maxLines: 2, overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.nunito(fontSize: 12, fontWeight: FontWeight.w700, color: nameC)),
                 const SizedBox(height: 2),
-                Text('${product.price.toStringAsFixed(2)} HTG',
+                Text(product.price,
                   style: GoogleFonts.nunito(fontSize: 11, fontWeight: FontWeight.w600, color: priceC)),
               ]),
             ),

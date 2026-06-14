@@ -12,7 +12,7 @@ _$MsgProductImpl _$$MsgProductImplFromJson(Map<String, dynamic> json) =>
       name: json['name'] as String? ?? '',
       slug: json['slug'] as String? ?? '',
       image: json['image'] as String? ?? '',
-      price: (json['price'] as num?)?.toDouble() ?? 0.0,
+      price: json['price'] as String? ?? '',
     );
 
 Map<String, dynamic> _$$MsgProductImplToJson(_$MsgProductImpl instance) =>
