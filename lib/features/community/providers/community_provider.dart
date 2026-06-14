@@ -274,10 +274,8 @@ class SupportFeedNotifier extends AutoDisposeAsyncNotifier<SupportFeedState> {
     try {
       final multiparts = await _filesToMultiparts(images);
       final msg = await _repo.postSupportMessage(content, images: multiparts);
-      // Force isFromClient=true — we know this message was sent by the client
-      final ownMsg = msg.copyWith(isFromClient: true);
-      _lastId = ownMsg.id;
-      state = AsyncData(current.copyWith(messages: [...current.messages, ownMsg], isSending: false));
+      _lastId = msg.id;
+      state = AsyncData(current.copyWith(messages: [...current.messages, msg], isSending: false));
     } catch (e) {
       state = AsyncData(current.copyWith(isSending: false));
       rethrow;

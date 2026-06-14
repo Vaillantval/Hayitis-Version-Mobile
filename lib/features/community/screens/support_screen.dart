@@ -398,7 +398,7 @@ class _DMBubble extends StatelessWidget {
   final bool adminView;
   const _DMBubble({required this.msg, this.adminView = false});
 
-  bool get _isRight => adminView ? !msg.isFromClient : msg.isFromClient;
+  bool get _isRight => msg.isOwn;
 
   @override
   Widget build(BuildContext context) {

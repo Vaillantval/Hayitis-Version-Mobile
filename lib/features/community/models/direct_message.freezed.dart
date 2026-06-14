@@ -23,8 +23,10 @@ DirectMessage _$DirectMessageFromJson(Map<String, dynamic> json) {
 mixin _$DirectMessage {
   int get id => throw _privateConstructorUsedError;
   String get content => throw _privateConstructorUsedError;
-  @JsonKey(name: 'is_from_client')
-  bool get isFromClient => throw _privateConstructorUsedError;
+  @JsonKey(name: 'is_own')
+  bool get isOwn => throw _privateConstructorUsedError;
+  @JsonKey(name: 'is_admin')
+  bool get isAdmin => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
   DateTime get createdAt => throw _privateConstructorUsedError;
   List<String> get attachments => throw _privateConstructorUsedError;
@@ -49,7 +51,8 @@ abstract class $DirectMessageCopyWith<$Res> {
   $Res call({
     int id,
     String content,
-    @JsonKey(name: 'is_from_client') bool isFromClient,
+    @JsonKey(name: 'is_own') bool isOwn,
+    @JsonKey(name: 'is_admin') bool isAdmin,
     @JsonKey(name: 'created_at') DateTime createdAt,
     List<String> attachments,
   });
@@ -72,7 +75,8 @@ class _$DirectMessageCopyWithImpl<$Res, $Val extends DirectMessage>
   $Res call({
     Object? id = null,
     Object? content = null,
-    Object? isFromClient = null,
+    Object? isOwn = null,
+    Object? isAdmin = null,
     Object? createdAt = null,
     Object? attachments = null,
   }) {
@@ -88,10 +92,15 @@ class _$DirectMessageCopyWithImpl<$Res, $Val extends DirectMessage>
                     ? _value.content
                     : content // ignore: cast_nullable_to_non_nullable
                         as String,
-            isFromClient:
-                null == isFromClient
-                    ? _value.isFromClient
-                    : isFromClient // ignore: cast_nullable_to_non_nullable
+            isOwn:
+                null == isOwn
+                    ? _value.isOwn
+                    : isOwn // ignore: cast_nullable_to_non_nullable
+                        as bool,
+            isAdmin:
+                null == isAdmin
+                    ? _value.isAdmin
+                    : isAdmin // ignore: cast_nullable_to_non_nullable
                         as bool,
             createdAt:
                 null == createdAt
@@ -121,7 +130,8 @@ abstract class _$$DirectMessageImplCopyWith<$Res>
   $Res call({
     int id,
     String content,
-    @JsonKey(name: 'is_from_client') bool isFromClient,
+    @JsonKey(name: 'is_own') bool isOwn,
+    @JsonKey(name: 'is_admin') bool isAdmin,
     @JsonKey(name: 'created_at') DateTime createdAt,
     List<String> attachments,
   });
@@ -143,7 +153,8 @@ class __$$DirectMessageImplCopyWithImpl<$Res>
   $Res call({
     Object? id = null,
     Object? content = null,
-    Object? isFromClient = null,
+    Object? isOwn = null,
+    Object? isAdmin = null,
     Object? createdAt = null,
     Object? attachments = null,
   }) {
@@ -159,10 +170,15 @@ class __$$DirectMessageImplCopyWithImpl<$Res>
                 ? _value.content
                 : content // ignore: cast_nullable_to_non_nullable
                     as String,
-        isFromClient:
-            null == isFromClient
-                ? _value.isFromClient
-                : isFromClient // ignore: cast_nullable_to_non_nullable
+        isOwn:
+            null == isOwn
+                ? _value.isOwn
+                : isOwn // ignore: cast_nullable_to_non_nullable
+                    as bool,
+        isAdmin:
+            null == isAdmin
+                ? _value.isAdmin
+                : isAdmin // ignore: cast_nullable_to_non_nullable
                     as bool,
         createdAt:
             null == createdAt
@@ -185,7 +201,8 @@ class _$DirectMessageImpl implements _DirectMessage {
   const _$DirectMessageImpl({
     required this.id,
     required this.content,
-    @JsonKey(name: 'is_from_client') this.isFromClient = false,
+    @JsonKey(name: 'is_own') this.isOwn = false,
+    @JsonKey(name: 'is_admin') this.isAdmin = false,
     @JsonKey(name: 'created_at') required this.createdAt,
     final List<String> attachments = const [],
   }) : _attachments = attachments;
@@ -198,8 +215,11 @@ class _$DirectMessageImpl implements _DirectMessage {
   @override
   final String content;
   @override
-  @JsonKey(name: 'is_from_client')
-  final bool isFromClient;
+  @JsonKey(name: 'is_own')
+  final bool isOwn;
+  @override
+  @JsonKey(name: 'is_admin')
+  final bool isAdmin;
   @override
   @JsonKey(name: 'created_at')
   final DateTime createdAt;
@@ -214,7 +234,7 @@ class _$DirectMessageImpl implements _DirectMessage {
 
   @override
   String toString() {
-    return 'DirectMessage(id: $id, content: $content, isFromClient: $isFromClient, createdAt: $createdAt, attachments: $attachments)';
+    return 'DirectMessage(id: $id, content: $content, isOwn: $isOwn, isAdmin: $isAdmin, createdAt: $createdAt, attachments: $attachments)';
   }
 
   @override
@@ -224,8 +244,8 @@ class _$DirectMessageImpl implements _DirectMessage {
             other is _$DirectMessageImpl &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.content, content) || other.content == content) &&
-            (identical(other.isFromClient, isFromClient) ||
-                other.isFromClient == isFromClient) &&
+            (identical(other.isOwn, isOwn) || other.isOwn == isOwn) &&
+            (identical(other.isAdmin, isAdmin) || other.isAdmin == isAdmin) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             const DeepCollectionEquality().equals(
@@ -240,7 +260,8 @@ class _$DirectMessageImpl implements _DirectMessage {
     runtimeType,
     id,
     content,
-    isFromClient,
+    isOwn,
+    isAdmin,
     createdAt,
     const DeepCollectionEquality().hash(_attachments),
   );
@@ -263,7 +284,8 @@ abstract class _DirectMessage implements DirectMessage {
   const factory _DirectMessage({
     required final int id,
     required final String content,
-    @JsonKey(name: 'is_from_client') final bool isFromClient,
+    @JsonKey(name: 'is_own') final bool isOwn,
+    @JsonKey(name: 'is_admin') final bool isAdmin,
     @JsonKey(name: 'created_at') required final DateTime createdAt,
     final List<String> attachments,
   }) = _$DirectMessageImpl;
@@ -276,8 +298,11 @@ abstract class _DirectMessage implements DirectMessage {
   @override
   String get content;
   @override
-  @JsonKey(name: 'is_from_client')
-  bool get isFromClient;
+  @JsonKey(name: 'is_own')
+  bool get isOwn;
+  @override
+  @JsonKey(name: 'is_admin')
+  bool get isAdmin;
   @override
   @JsonKey(name: 'created_at')
   DateTime get createdAt;

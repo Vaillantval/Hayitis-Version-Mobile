@@ -7,7 +7,8 @@ class DirectMessage with _$DirectMessage {
   const factory DirectMessage({
     required int id,
     required String content,
-    @JsonKey(name: 'is_from_client') @Default(false) bool isFromClient,
+    @JsonKey(name: 'is_own') @Default(false) bool isOwn,
+    @JsonKey(name: 'is_admin') @Default(false) bool isAdmin,
     @JsonKey(name: 'created_at') required DateTime createdAt,
     @Default([]) List<String> attachments,
   }) = _DirectMessage;

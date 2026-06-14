@@ -10,7 +10,8 @@ _$DirectMessageImpl _$$DirectMessageImplFromJson(Map<String, dynamic> json) =>
     _$DirectMessageImpl(
       id: (json['id'] as num).toInt(),
       content: json['content'] as String,
-      isFromClient: json['is_from_client'] as bool? ?? false,
+      isOwn: json['is_own'] as bool? ?? false,
+      isAdmin: json['is_admin'] as bool? ?? false,
       createdAt: DateTime.parse(json['created_at'] as String),
       attachments:
           (json['attachments'] as List<dynamic>?)
@@ -23,7 +24,8 @@ Map<String, dynamic> _$$DirectMessageImplToJson(_$DirectMessageImpl instance) =>
     <String, dynamic>{
       'id': instance.id,
       'content': instance.content,
-      'is_from_client': instance.isFromClient,
+      'is_own': instance.isOwn,
+      'is_admin': instance.isAdmin,
       'created_at': instance.createdAt.toIso8601String(),
       'attachments': instance.attachments,
     };
