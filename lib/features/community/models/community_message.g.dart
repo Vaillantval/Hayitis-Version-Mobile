@@ -58,6 +58,8 @@ _$CommunityMessageImpl _$$CommunityMessageImplFromJson(
       json['product'] == null
           ? null
           : MsgProduct.fromJson(json['product'] as Map<String, dynamic>),
+  audio: json['audio'] as String?,
+  audioDuration: (json['audio_duration'] as num?)?.toInt() ?? 0,
   attachments:
       (json['attachments'] as List<dynamic>?)
           ?.map((e) => e as String)
@@ -89,6 +91,8 @@ Map<String, dynamic> _$$CommunityMessageImplToJson(
   'can_moderate': instance.canModerate,
   'reply_to': instance.replyTo,
   'product': instance.product,
+  'audio': instance.audio,
+  'audio_duration': instance.audioDuration,
   'attachments': instance.attachments,
   'reactions': instance.reactions,
   'my_reactions': instance.myReactions,

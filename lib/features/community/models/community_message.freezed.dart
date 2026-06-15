@@ -500,6 +500,9 @@ mixin _$CommunityMessage {
   @JsonKey(name: 'reply_to')
   MsgReplyTo? get replyTo => throw _privateConstructorUsedError;
   MsgProduct? get product => throw _privateConstructorUsedError;
+  String? get audio => throw _privateConstructorUsedError;
+  @JsonKey(name: 'audio_duration')
+  int get audioDuration => throw _privateConstructorUsedError;
   List<String> get attachments =>
       throw _privateConstructorUsedError; // API returns {"❤️": 3} — dict emoji → count
   Map<String, int> get reactions => throw _privateConstructorUsedError;
@@ -535,6 +538,8 @@ abstract class $CommunityMessageCopyWith<$Res> {
     @JsonKey(name: 'can_moderate') bool canModerate,
     @JsonKey(name: 'reply_to') MsgReplyTo? replyTo,
     MsgProduct? product,
+    String? audio,
+    @JsonKey(name: 'audio_duration') int audioDuration,
     List<String> attachments,
     Map<String, int> reactions,
     @JsonKey(name: 'my_reactions') List<String> myReactions,
@@ -570,6 +575,8 @@ class _$CommunityMessageCopyWithImpl<$Res, $Val extends CommunityMessage>
     Object? canModerate = null,
     Object? replyTo = freezed,
     Object? product = freezed,
+    Object? audio = freezed,
+    Object? audioDuration = null,
     Object? attachments = null,
     Object? reactions = null,
     Object? myReactions = null,
@@ -631,6 +638,16 @@ class _$CommunityMessageCopyWithImpl<$Res, $Val extends CommunityMessage>
                     ? _value.product
                     : product // ignore: cast_nullable_to_non_nullable
                         as MsgProduct?,
+            audio:
+                freezed == audio
+                    ? _value.audio
+                    : audio // ignore: cast_nullable_to_non_nullable
+                        as String?,
+            audioDuration:
+                null == audioDuration
+                    ? _value.audioDuration
+                    : audioDuration // ignore: cast_nullable_to_non_nullable
+                        as int,
             attachments:
                 null == attachments
                     ? _value.attachments
@@ -701,6 +718,8 @@ abstract class _$$CommunityMessageImplCopyWith<$Res>
     @JsonKey(name: 'can_moderate') bool canModerate,
     @JsonKey(name: 'reply_to') MsgReplyTo? replyTo,
     MsgProduct? product,
+    String? audio,
+    @JsonKey(name: 'audio_duration') int audioDuration,
     List<String> attachments,
     Map<String, int> reactions,
     @JsonKey(name: 'my_reactions') List<String> myReactions,
@@ -737,6 +756,8 @@ class __$$CommunityMessageImplCopyWithImpl<$Res>
     Object? canModerate = null,
     Object? replyTo = freezed,
     Object? product = freezed,
+    Object? audio = freezed,
+    Object? audioDuration = null,
     Object? attachments = null,
     Object? reactions = null,
     Object? myReactions = null,
@@ -798,6 +819,16 @@ class __$$CommunityMessageImplCopyWithImpl<$Res>
                 ? _value.product
                 : product // ignore: cast_nullable_to_non_nullable
                     as MsgProduct?,
+        audio:
+            freezed == audio
+                ? _value.audio
+                : audio // ignore: cast_nullable_to_non_nullable
+                    as String?,
+        audioDuration:
+            null == audioDuration
+                ? _value.audioDuration
+                : audioDuration // ignore: cast_nullable_to_non_nullable
+                    as int,
         attachments:
             null == attachments
                 ? _value._attachments
@@ -833,6 +864,8 @@ class _$CommunityMessageImpl implements _CommunityMessage {
     @JsonKey(name: 'can_moderate') this.canModerate = false,
     @JsonKey(name: 'reply_to') this.replyTo,
     this.product,
+    this.audio,
+    @JsonKey(name: 'audio_duration') this.audioDuration = 0,
     final List<String> attachments = const [],
     final Map<String, int> reactions = const {},
     @JsonKey(name: 'my_reactions') final List<String> myReactions = const [],
@@ -875,6 +908,11 @@ class _$CommunityMessageImpl implements _CommunityMessage {
   final MsgReplyTo? replyTo;
   @override
   final MsgProduct? product;
+  @override
+  final String? audio;
+  @override
+  @JsonKey(name: 'audio_duration')
+  final int audioDuration;
   final List<String> _attachments;
   @override
   @JsonKey()
@@ -906,7 +944,7 @@ class _$CommunityMessageImpl implements _CommunityMessage {
 
   @override
   String toString() {
-    return 'CommunityMessage(id: $id, content: $content, authorName: $authorName, createdAt: $createdAt, isPinned: $isPinned, isDeleted: $isDeleted, isStaff: $isStaff, isOwn: $isOwn, canModerate: $canModerate, replyTo: $replyTo, product: $product, attachments: $attachments, reactions: $reactions, myReactions: $myReactions)';
+    return 'CommunityMessage(id: $id, content: $content, authorName: $authorName, createdAt: $createdAt, isPinned: $isPinned, isDeleted: $isDeleted, isStaff: $isStaff, isOwn: $isOwn, canModerate: $canModerate, replyTo: $replyTo, product: $product, audio: $audio, audioDuration: $audioDuration, attachments: $attachments, reactions: $reactions, myReactions: $myReactions)';
   }
 
   @override
@@ -930,6 +968,9 @@ class _$CommunityMessageImpl implements _CommunityMessage {
                 other.canModerate == canModerate) &&
             (identical(other.replyTo, replyTo) || other.replyTo == replyTo) &&
             (identical(other.product, product) || other.product == product) &&
+            (identical(other.audio, audio) || other.audio == audio) &&
+            (identical(other.audioDuration, audioDuration) ||
+                other.audioDuration == audioDuration) &&
             const DeepCollectionEquality().equals(
               other._attachments,
               _attachments,
@@ -959,6 +1000,8 @@ class _$CommunityMessageImpl implements _CommunityMessage {
     canModerate,
     replyTo,
     product,
+    audio,
+    audioDuration,
     const DeepCollectionEquality().hash(_attachments),
     const DeepCollectionEquality().hash(_reactions),
     const DeepCollectionEquality().hash(_myReactions),
@@ -994,6 +1037,8 @@ abstract class _CommunityMessage implements CommunityMessage {
     @JsonKey(name: 'can_moderate') final bool canModerate,
     @JsonKey(name: 'reply_to') final MsgReplyTo? replyTo,
     final MsgProduct? product,
+    final String? audio,
+    @JsonKey(name: 'audio_duration') final int audioDuration,
     final List<String> attachments,
     final Map<String, int> reactions,
     @JsonKey(name: 'my_reactions') final List<String> myReactions,
@@ -1032,6 +1077,11 @@ abstract class _CommunityMessage implements CommunityMessage {
   MsgReplyTo? get replyTo;
   @override
   MsgProduct? get product;
+  @override
+  String? get audio;
+  @override
+  @JsonKey(name: 'audio_duration')
+  int get audioDuration;
   @override
   List<String> get attachments; // API returns {"❤️": 3} — dict emoji → count
   @override

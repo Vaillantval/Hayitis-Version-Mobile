@@ -29,9 +29,12 @@ dependencies:
   # Navigation
   go_router: ^14.6.2
 
-  # Images
+  # Images & Audio
   cached_network_image: ^3.4.1
   image_picker: ^1.1.2
+  flutter_sound: ^9.16.0
+  audioplayers: ^6.1.0
+  path_provider: ^2.1.5
 
   # Paiements
   flutter_stripe: ^11.1.0

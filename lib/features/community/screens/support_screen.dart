@@ -1,6 +1,10 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter_sound/flutter_sound.dart';
+import 'package:path_provider/path_provider.dart';
+import '../../../shared/widgets/audio_message_bubble.dart';
 import 'package:dio/dio.dart';
 import '../../../shared/widgets/full_screen_image_viewer.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart' as ep;
@@ -115,6 +119,18 @@ class _ClientSupportViewState extends ConsumerState<_ClientSupportView> {
     }
   }
 
+  Future<void> _sendAudio(String path, int duration) async {
+    final replyId = _replyToId;
+    setState(() { _replyToId = null; _replyAuthor = null; _replySnippet = null; });
+    try {
+      await ref.read(supportFeedProvider.notifier).send('', replyToId: replyId, audioPath: path, audioDuration: duration);
+      WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erreur: $e'), backgroundColor: AppColors.error));
+    }
+  }
+
   Future<void> _send() async {
     final text = _textCtrl.text.trim();
     if (text.isEmpty && _pendingImages.isEmpty) return;
@@ -187,9 +203,9 @@ class _ClientSupportViewState extends ConsumerState<_ClientSupportView> {
                 itemBuilder: (_, i) => _DMBubble(
                   msg: feed.messages[i],
                   onReply: (m) => setState(() {
-                    _replyToId     = m.id;
-                    _replyAuthor   = m.isAdmin ? "Support Hayiti's" : 'Moi';
-                    _replySnippet  = m.content.isNotEmpty ? m.content : '📷 image';
+                    _replyToId    = m.id;
+                    _replyAuthor  = m.isAdmin ? "Support Hayiti's" : 'Moi';
+                    _replySnippet = m.content.isNotEmpty ? m.content : m.audio != null ? '🎵 Message vocal' : '📷 Image';
                   }),
                 ),
               );
@@ -214,6 +230,8 @@ class _ClientSupportViewState extends ConsumerState<_ClientSupportView> {
           onSend: _send,
           onPickImage: _pickImage,
           isSending: feedAsync.valueOrNull?.isSending ?? false,
+          hasPendingImages: _pendingImages.isNotEmpty,
+          onAudioSend: _sendAudio,
         ),
       ]),
     );
@@ -352,6 +370,20 @@ class _AdminConversationViewState extends ConsumerState<_AdminConversationView> 
     if (files.isNotEmpty) setState(() => _pendingImages.addAll(files));
   }
 
+  Future<void> _sendAudio(String path, int duration) async {
+    final replyId = _replyToId;
+    setState(() { _replyToId = null; _replyAuthor = null; _replySnippet = null; _sending = true; });
+    try {
+      final audio = await MultipartFile.fromFile(path);
+      final msg = await ref.read(communityRepositoryProvider)
+          .postConversationMessage(widget.conv.id, '', replyToId: replyId, audio: audio, audioDuration: duration);
+      if (mounted) setState(() { _messages.add(msg); _sending = false; });
+      WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
+    } catch (_) {
+      if (mounted) setState(() => _sending = false);
+    }
+  }
+
   Future<void> _send() async {
     final text = _textCtrl.text.trim();
     if (text.isEmpty && _pendingImages.isEmpty) return;
@@ -394,9 +426,9 @@ class _AdminConversationViewState extends ConsumerState<_AdminConversationView> 
                   msg: _messages[i],
                   adminView: true,
                   onReply: (m) => setState(() {
-                    _replyToId     = m.id;
-                    _replyAuthor   = m.isAdmin ? 'Moi' : widget.conv.clientName;
-                    _replySnippet  = m.content.isNotEmpty ? m.content : '📷 image';
+                    _replyToId    = m.id;
+                    _replyAuthor  = m.isAdmin ? 'Moi' : widget.conv.clientName;
+                    _replySnippet = m.content.isNotEmpty ? m.content : m.audio != null ? '🎵 Message vocal' : '📷 Image';
                   }),
                 ),
               ),
@@ -416,6 +448,8 @@ class _AdminConversationViewState extends ConsumerState<_AdminConversationView> 
           onSend: _send,
           onPickImage: _pickImage,
           isSending: _sending,
+          hasPendingImages: _pendingImages.isNotEmpty,
+          onAudioSend: _sendAudio,
         ),
       ]),
     );
@@ -476,12 +510,16 @@ class _SupportComposer extends StatefulWidget {
   final VoidCallback onSend;
   final VoidCallback? onPickImage;
   final bool isSending;
+  final bool hasPendingImages;
+  final Future<void> Function(String path, int duration)? onAudioSend;
 
   const _SupportComposer({
     required this.textCtrl,
     required this.onSend,
     this.onPickImage,
     required this.isSending,
+    this.hasPendingImages = false,
+    this.onAudioSend,
   });
 
   @override
@@ -489,34 +527,100 @@ class _SupportComposer extends StatefulWidget {
 }
 
 class _SupportComposerState extends State<_SupportComposer> {
-  bool _showEmoji = false;
-  final _focusNode = FocusNode();
+  bool _showEmoji   = false;
+  bool _isRecording = false;
+  bool _cancelRec   = false;
+  int  _recSeconds  = 0;
+  double _dragX     = 0;
+  final _focusNode  = FocusNode();
+  final _recorder   = FlutterSoundRecorder();
+  Timer? _recTimer;
+  Timer? _maxTimer;
+  String? _recPath;
 
   @override
   void initState() {
     super.initState();
+    widget.textCtrl.addListener(_onTextChanged);
     _focusNode.addListener(() {
-      if (_focusNode.hasFocus && _showEmoji) {
-        setState(() => _showEmoji = false);
-      }
+      if (_focusNode.hasFocus && _showEmoji) setState(() => _showEmoji = false);
     });
   }
 
   @override
+  void didUpdateWidget(_SupportComposer old) {
+    super.didUpdateWidget(old);
+    if (old.textCtrl != widget.textCtrl) {
+      old.textCtrl.removeListener(_onTextChanged);
+      widget.textCtrl.addListener(_onTextChanged);
+    }
+  }
+
+  void _onTextChanged() => setState(() {});
+
+  @override
   void dispose() {
+    widget.textCtrl.removeListener(_onTextChanged);
     _focusNode.dispose();
+    _recTimer?.cancel();
+    _maxTimer?.cancel();
+    if (_isRecording) {
+      _recorder.stopRecorder().then((p) {
+        if (p != null) try { File(p).deleteSync(); } catch (_) {}
+        _recorder.closeRecorder();
+      });
+    }
     super.dispose();
   }
 
   void _toggleEmoji() {
-    if (_showEmoji) {
-      _focusNode.requestFocus();
-      setState(() => _showEmoji = false);
-    } else {
-      _focusNode.unfocus();
-      setState(() => _showEmoji = true);
-    }
+    if (_showEmoji) { _focusNode.requestFocus(); setState(() => _showEmoji = false); }
+    else            { _focusNode.unfocus();       setState(() => _showEmoji = true); }
   }
+
+  Future<void> _startRecording() async {
+    try {
+      await _recorder.openRecorder();
+    } catch (_) {
+      return;
+    }
+    if (!mounted) { await _recorder.closeRecorder(); return; }
+    final dir = await getTemporaryDirectory();
+    _recPath = '${dir.path}/audio_${DateTime.now().millisecondsSinceEpoch}.m4a';
+    try {
+      await _recorder.startRecorder(toFile: _recPath!, codec: Codec.aacMP4);
+    } catch (_) {
+      await _recorder.closeRecorder();
+      return;
+    }
+    if (!mounted) { await _recorder.stopRecorder(); await _recorder.closeRecorder(); return; }
+    setState(() { _isRecording = true; _cancelRec = false; _recSeconds = 0; _dragX = 0; _showEmoji = false; });
+    _recTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (mounted) setState(() => _recSeconds++);
+    });
+    _maxTimer = Timer(const Duration(seconds: 120), _stopAndSend);
+  }
+
+  Future<void> _stopAndSend() async {
+    _recTimer?.cancel();
+    _maxTimer?.cancel();
+    final path = await _recorder.stopRecorder();
+    await _recorder.closeRecorder();
+    final duration = _recSeconds;
+    if (mounted) setState(() { _isRecording = false; _cancelRec = false; _recSeconds = 0; _dragX = 0; });
+    if (path != null && widget.onAudioSend != null) await widget.onAudioSend!(path, duration);
+  }
+
+  Future<void> _cancelRecording() async {
+    _recTimer?.cancel();
+    _maxTimer?.cancel();
+    final path = await _recorder.stopRecorder();
+    await _recorder.closeRecorder();
+    if (mounted) setState(() { _isRecording = false; _cancelRec = false; _recSeconds = 0; _dragX = 0; });
+    if (path != null) try { File(path).deleteSync(); } catch (_) {}
+  }
+
+  String _fmtSec(int s) => '${s ~/ 60}:${(s % 60).toString().padLeft(2, '0')}';
 
   @override
   Widget build(BuildContext context) {
@@ -527,61 +631,9 @@ class _SupportComposerState extends State<_SupportComposer> {
           border: Border(top: BorderSide(color: AppColors.cardBorder)),
         ),
         padding: const EdgeInsets.fromLTRB(4, 6, 8, 8),
-        child: Row(children: [
-          // Emoji button
-          IconButton(
-            icon: Icon(
-              _showEmoji ? Icons.keyboard_rounded : Icons.emoji_emotions_outlined,
-              color: _showEmoji ? _kAccent : AppColors.textMuted,
-            ),
-            onPressed: _toggleEmoji,
-            tooltip: 'Emoji',
-          ),
-          // Image button
-          if (widget.onPickImage != null)
-            IconButton(
-              icon: const Icon(Icons.image_outlined, color: AppColors.textMuted),
-              onPressed: widget.onPickImage,
-              tooltip: 'Image',
-            ),
-          // Text field
-          Expanded(
-            child: TextField(
-              controller: widget.textCtrl,
-              focusNode: _focusNode,
-              maxLines: null, minLines: 1, maxLength: 2000,
-              decoration: InputDecoration(
-                hintText: 'Votre message...',
-                hintStyle: GoogleFonts.nunito(color: AppColors.textMuted, fontSize: 14),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(22), borderSide: BorderSide.none),
-                filled: true, fillColor: AppColors.background,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                counterText: '',
-              ),
-              style: GoogleFonts.nunito(fontSize: 14, color: AppColors.dark),
-            ),
-          ),
-          const SizedBox(width: 6),
-          // Send button
-          GestureDetector(
-            onTap: widget.isSending ? null : widget.onSend,
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              width: 42, height: 42,
-              decoration: BoxDecoration(
-                color: widget.isSending ? AppColors.textMuted : _kAccent,
-                shape: BoxShape.circle,
-              ),
-              child: widget.isSending
-                ? const Center(child: SizedBox(width: 18, height: 18,
-                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)))
-                : const Icon(Icons.send_rounded, color: Colors.white, size: 20),
-            ),
-          ),
-        ]),
+        child: _isRecording ? _buildRecordingRow() : _buildNormalRow(),
       ),
-      // Emoji panel
-      if (_showEmoji)
+      if (!_isRecording && _showEmoji)
         SizedBox(
           height: 256,
           child: ep.EmojiPicker(
@@ -603,6 +655,118 @@ class _SupportComposerState extends State<_SupportComposer> {
               ),
               bottomActionBarConfig: const ep.BottomActionBarConfig(enabled: false),
             ),
+          ),
+        ),
+    ]);
+  }
+
+  Widget _buildRecordingRow() {
+    final cancelled = _dragX < -70;
+    return Row(children: [
+      GestureDetector(
+        onTap: _cancelRecording,
+        child: const Padding(
+          padding: EdgeInsets.all(8),
+          child: Icon(Icons.delete_outline, color: AppColors.error, size: 24),
+        ),
+      ),
+      Expanded(
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          decoration: BoxDecoration(color: AppColors.background, borderRadius: BorderRadius.circular(22)),
+          child: Row(children: [
+            Container(width: 8, height: 8,
+              decoration: const BoxDecoration(color: AppColors.error, shape: BoxShape.circle)),
+            const SizedBox(width: 8),
+            Text(_fmtSec(_recSeconds),
+              style: GoogleFonts.nunito(fontSize: 14, color: AppColors.dark, fontWeight: FontWeight.w600)),
+            const Spacer(),
+            Text(
+              cancelled ? 'Annuler' : '← Glisser pour annuler',
+              style: GoogleFonts.nunito(fontSize: 11, color: cancelled ? AppColors.error : AppColors.textMuted),
+            ),
+          ]),
+        ),
+      ),
+      const SizedBox(width: 8),
+      GestureDetector(
+        onTap: _stopAndSend,
+        child: Container(
+          width: 42, height: 42,
+          decoration: const BoxDecoration(color: _kAccent, shape: BoxShape.circle),
+          child: const Icon(Icons.send_rounded, color: Colors.white, size: 20),
+        ),
+      ),
+    ]);
+  }
+
+  Widget _buildNormalRow() {
+    final hasText = widget.textCtrl.text.trim().isNotEmpty;
+    final showSend = hasText || widget.hasPendingImages || widget.isSending;
+    return Row(children: [
+      IconButton(
+        icon: Icon(_showEmoji ? Icons.keyboard_rounded : Icons.emoji_emotions_outlined,
+          color: _showEmoji ? _kAccent : AppColors.textMuted),
+        onPressed: _toggleEmoji,
+        tooltip: 'Emoji',
+      ),
+      if (widget.onPickImage != null)
+        IconButton(
+          icon: const Icon(Icons.image_outlined, color: AppColors.textMuted),
+          onPressed: widget.onPickImage,
+          tooltip: 'Image',
+        ),
+      Expanded(
+        child: TextField(
+          controller: widget.textCtrl,
+          focusNode: _focusNode,
+          maxLines: null, minLines: 1, maxLength: 2000,
+          decoration: InputDecoration(
+            hintText: 'Votre message...',
+            hintStyle: GoogleFonts.nunito(color: AppColors.textMuted, fontSize: 14),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(22), borderSide: BorderSide.none),
+            filled: true, fillColor: AppColors.background,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            counterText: '',
+          ),
+          style: GoogleFonts.nunito(fontSize: 14, color: AppColors.dark),
+        ),
+      ),
+      const SizedBox(width: 6),
+      if (showSend)
+        GestureDetector(
+          onTap: widget.isSending ? null : widget.onSend,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            width: 42, height: 42,
+            decoration: BoxDecoration(
+              color: widget.isSending ? AppColors.textMuted : _kAccent,
+              shape: BoxShape.circle,
+            ),
+            child: widget.isSending
+              ? const Center(child: SizedBox(width: 18, height: 18,
+                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)))
+              : const Icon(Icons.send_rounded, color: Colors.white, size: 20),
+          ),
+        )
+      else
+        GestureDetector(
+          onLongPressStart: (_) => _startRecording(),
+          onLongPressMoveUpdate: (d) {
+            if (!_isRecording) return;
+            setState(() => _dragX = d.localOffsetFromOrigin.dx);
+            if (_dragX < -70 && !_cancelRec) setState(() => _cancelRec = true);
+            if (_dragX >= -70 && _cancelRec)  setState(() => _cancelRec = false);
+          },
+          onLongPressEnd: (_) {
+            if (!_isRecording) return;
+            if (_cancelRec) _cancelRecording(); else _stopAndSend();
+          },
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 150),
+            width: 42, height: 42,
+            decoration: const BoxDecoration(color: _kAccent, shape: BoxShape.circle),
+            child: const Icon(Icons.mic_rounded, color: Colors.white, size: 22),
           ),
         ),
     ]);
@@ -649,6 +813,14 @@ class _DMBubble extends StatelessWidget {
               ),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 if (msg.replyTo != null) _DmReplyContext(reply: msg.replyTo!, isOwn: _isRight),
+                if (msg.audio != null) Padding(
+                  padding: const EdgeInsets.only(bottom: 4),
+                  child: AudioMessageBubble(
+                    url: msg.audio,
+                    duration: msg.audioDuration,
+                    isOwn: _isRight,
+                  ),
+                ),
                 if (msg.content.isNotEmpty)
                   Text(msg.content,
                     style: GoogleFonts.nunito(fontSize: 14, color: _isRight ? Colors.white : AppColors.dark, height: 1.4)),

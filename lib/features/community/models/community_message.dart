@@ -39,6 +39,8 @@ class CommunityMessage with _$CommunityMessage {
     @JsonKey(name: 'can_moderate') @Default(false) bool canModerate,
     @JsonKey(name: 'reply_to')     MsgReplyTo? replyTo,
     MsgProduct? product,
+    String? audio,
+    @JsonKey(name: 'audio_duration') @Default(0) int audioDuration,
     @Default([]) List<String> attachments,
     // API returns {"❤️": 3} — dict emoji → count
     @Default({}) Map<String, int> reactions,

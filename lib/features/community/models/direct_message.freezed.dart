@@ -22,7 +22,7 @@ DmReplyTo _$DmReplyToFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$DmReplyTo {
   int get id => throw _privateConstructorUsedError;
-  @JsonKey(name: 'sender_name')
+  @JsonKey(name: 'sender')
   String get senderName => throw _privateConstructorUsedError;
   String get excerpt => throw _privateConstructorUsedError;
 
@@ -43,7 +43,7 @@ abstract class $DmReplyToCopyWith<$Res> {
   @useResult
   $Res call({
     int id,
-    @JsonKey(name: 'sender_name') String senderName,
+    @JsonKey(name: 'sender') String senderName,
     String excerpt,
   });
 }
@@ -101,7 +101,7 @@ abstract class _$$DmReplyToImplCopyWith<$Res>
   @useResult
   $Res call({
     int id,
-    @JsonKey(name: 'sender_name') String senderName,
+    @JsonKey(name: 'sender') String senderName,
     String excerpt,
   });
 }
@@ -151,7 +151,7 @@ class __$$DmReplyToImplCopyWithImpl<$Res>
 class _$DmReplyToImpl implements _DmReplyTo {
   const _$DmReplyToImpl({
     required this.id,
-    @JsonKey(name: 'sender_name') this.senderName = '',
+    @JsonKey(name: 'sender') this.senderName = '',
     this.excerpt = '',
   });
 
@@ -161,7 +161,7 @@ class _$DmReplyToImpl implements _DmReplyTo {
   @override
   final int id;
   @override
-  @JsonKey(name: 'sender_name')
+  @JsonKey(name: 'sender')
   final String senderName;
   @override
   @JsonKey()
@@ -204,7 +204,7 @@ class _$DmReplyToImpl implements _DmReplyTo {
 abstract class _DmReplyTo implements DmReplyTo {
   const factory _DmReplyTo({
     required final int id,
-    @JsonKey(name: 'sender_name') final String senderName,
+    @JsonKey(name: 'sender') final String senderName,
     final String excerpt,
   }) = _$DmReplyToImpl;
 
@@ -214,7 +214,7 @@ abstract class _DmReplyTo implements DmReplyTo {
   @override
   int get id;
   @override
-  @JsonKey(name: 'sender_name')
+  @JsonKey(name: 'sender')
   String get senderName;
   @override
   String get excerpt;
@@ -243,6 +243,9 @@ mixin _$DirectMessage {
   DateTime get createdAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'reply_to')
   DmReplyTo? get replyTo => throw _privateConstructorUsedError;
+  String? get audio => throw _privateConstructorUsedError;
+  @JsonKey(name: 'audio_duration')
+  int get audioDuration => throw _privateConstructorUsedError;
   List<String> get attachments => throw _privateConstructorUsedError;
 
   /// Serializes this DirectMessage to a JSON map.
@@ -269,6 +272,8 @@ abstract class $DirectMessageCopyWith<$Res> {
     @JsonKey(name: 'is_admin') bool isAdmin,
     @JsonKey(name: 'created_at') DateTime createdAt,
     @JsonKey(name: 'reply_to') DmReplyTo? replyTo,
+    String? audio,
+    @JsonKey(name: 'audio_duration') int audioDuration,
     List<String> attachments,
   });
 
@@ -296,6 +301,8 @@ class _$DirectMessageCopyWithImpl<$Res, $Val extends DirectMessage>
     Object? isAdmin = null,
     Object? createdAt = null,
     Object? replyTo = freezed,
+    Object? audio = freezed,
+    Object? audioDuration = null,
     Object? attachments = null,
   }) {
     return _then(
@@ -330,6 +337,16 @@ class _$DirectMessageCopyWithImpl<$Res, $Val extends DirectMessage>
                     ? _value.replyTo
                     : replyTo // ignore: cast_nullable_to_non_nullable
                         as DmReplyTo?,
+            audio:
+                freezed == audio
+                    ? _value.audio
+                    : audio // ignore: cast_nullable_to_non_nullable
+                        as String?,
+            audioDuration:
+                null == audioDuration
+                    ? _value.audioDuration
+                    : audioDuration // ignore: cast_nullable_to_non_nullable
+                        as int,
             attachments:
                 null == attachments
                     ? _value.attachments
@@ -371,6 +388,8 @@ abstract class _$$DirectMessageImplCopyWith<$Res>
     @JsonKey(name: 'is_admin') bool isAdmin,
     @JsonKey(name: 'created_at') DateTime createdAt,
     @JsonKey(name: 'reply_to') DmReplyTo? replyTo,
+    String? audio,
+    @JsonKey(name: 'audio_duration') int audioDuration,
     List<String> attachments,
   });
 
@@ -398,6 +417,8 @@ class __$$DirectMessageImplCopyWithImpl<$Res>
     Object? isAdmin = null,
     Object? createdAt = null,
     Object? replyTo = freezed,
+    Object? audio = freezed,
+    Object? audioDuration = null,
     Object? attachments = null,
   }) {
     return _then(
@@ -432,6 +453,16 @@ class __$$DirectMessageImplCopyWithImpl<$Res>
                 ? _value.replyTo
                 : replyTo // ignore: cast_nullable_to_non_nullable
                     as DmReplyTo?,
+        audio:
+            freezed == audio
+                ? _value.audio
+                : audio // ignore: cast_nullable_to_non_nullable
+                    as String?,
+        audioDuration:
+            null == audioDuration
+                ? _value.audioDuration
+                : audioDuration // ignore: cast_nullable_to_non_nullable
+                    as int,
         attachments:
             null == attachments
                 ? _value._attachments
@@ -452,6 +483,8 @@ class _$DirectMessageImpl implements _DirectMessage {
     @JsonKey(name: 'is_admin') this.isAdmin = false,
     @JsonKey(name: 'created_at') required this.createdAt,
     @JsonKey(name: 'reply_to') this.replyTo,
+    this.audio,
+    @JsonKey(name: 'audio_duration') this.audioDuration = 0,
     final List<String> attachments = const [],
   }) : _attachments = attachments;
 
@@ -474,6 +507,11 @@ class _$DirectMessageImpl implements _DirectMessage {
   @override
   @JsonKey(name: 'reply_to')
   final DmReplyTo? replyTo;
+  @override
+  final String? audio;
+  @override
+  @JsonKey(name: 'audio_duration')
+  final int audioDuration;
   final List<String> _attachments;
   @override
   @JsonKey()
@@ -485,7 +523,7 @@ class _$DirectMessageImpl implements _DirectMessage {
 
   @override
   String toString() {
-    return 'DirectMessage(id: $id, content: $content, isOwn: $isOwn, isAdmin: $isAdmin, createdAt: $createdAt, replyTo: $replyTo, attachments: $attachments)';
+    return 'DirectMessage(id: $id, content: $content, isOwn: $isOwn, isAdmin: $isAdmin, createdAt: $createdAt, replyTo: $replyTo, audio: $audio, audioDuration: $audioDuration, attachments: $attachments)';
   }
 
   @override
@@ -500,6 +538,9 @@ class _$DirectMessageImpl implements _DirectMessage {
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.replyTo, replyTo) || other.replyTo == replyTo) &&
+            (identical(other.audio, audio) || other.audio == audio) &&
+            (identical(other.audioDuration, audioDuration) ||
+                other.audioDuration == audioDuration) &&
             const DeepCollectionEquality().equals(
               other._attachments,
               _attachments,
@@ -516,6 +557,8 @@ class _$DirectMessageImpl implements _DirectMessage {
     isAdmin,
     createdAt,
     replyTo,
+    audio,
+    audioDuration,
     const DeepCollectionEquality().hash(_attachments),
   );
 
@@ -541,6 +584,8 @@ abstract class _DirectMessage implements DirectMessage {
     @JsonKey(name: 'is_admin') final bool isAdmin,
     @JsonKey(name: 'created_at') required final DateTime createdAt,
     @JsonKey(name: 'reply_to') final DmReplyTo? replyTo,
+    final String? audio,
+    @JsonKey(name: 'audio_duration') final int audioDuration,
     final List<String> attachments,
   }) = _$DirectMessageImpl;
 
@@ -563,6 +608,11 @@ abstract class _DirectMessage implements DirectMessage {
   @override
   @JsonKey(name: 'reply_to')
   DmReplyTo? get replyTo;
+  @override
+  String? get audio;
+  @override
+  @JsonKey(name: 'audio_duration')
+  int get audioDuration;
   @override
   List<String> get attachments;
 

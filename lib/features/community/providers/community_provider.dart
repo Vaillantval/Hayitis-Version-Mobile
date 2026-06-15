@@ -110,13 +110,15 @@ class ChannelFeedNotifier extends AutoDisposeFamilyAsyncNotifier<ChannelFeedStat
     }
   }
 
-  Future<void> sendMessage(String content, {int? replyToId, List<XFile>? images}) async {
+  Future<void> sendMessage(String content, {int? replyToId, List<XFile>? images, String? audioPath, int? audioDuration}) async {
     final current = state.valueOrNull;
     if (current == null) return;
     state = AsyncData(current.copyWith(isSending: true));
     try {
       final multiparts = await _filesToMultiparts(images);
-      final msg = await _repo.postMessage(_slug, content: content, replyToId: replyToId, images: multiparts);
+      MultipartFile? audioFile;
+      if (audioPath != null) audioFile = await MultipartFile.fromFile(audioPath);
+      final msg = await _repo.postMessage(_slug, content: content, replyToId: replyToId, images: multiparts, audio: audioFile, audioDuration: audioDuration);
       _lastId = msg.id;
       state = AsyncData(current.copyWith(
         messages: [...current.messages, msg],
@@ -273,13 +275,15 @@ class SupportFeedNotifier extends AutoDisposeAsyncNotifier<SupportFeedState> {
     } catch (_) {}
   }
 
-  Future<void> send(String content, {int? replyToId, List<XFile>? images}) async {
+  Future<void> send(String content, {int? replyToId, List<XFile>? images, String? audioPath, int? audioDuration}) async {
     final current = state.valueOrNull;
     if (current == null) return;
     state = AsyncData(current.copyWith(isSending: true));
     try {
       final multiparts = await _filesToMultiparts(images);
-      final msg = await _repo.postSupportMessage(content, replyToId: replyToId, images: multiparts);
+      MultipartFile? audioFile;
+      if (audioPath != null) audioFile = await MultipartFile.fromFile(audioPath);
+      final msg = await _repo.postSupportMessage(content, replyToId: replyToId, images: multiparts, audio: audioFile, audioDuration: audioDuration);
       _lastId = msg.id;
       state = AsyncData(current.copyWith(messages: [...current.messages, msg], isSending: false));
     } catch (e) {

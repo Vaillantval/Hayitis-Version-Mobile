@@ -69,12 +69,16 @@ class CommunityRepository {
     required String content,
     int? replyToId,
     List<MultipartFile>? images,
+    MultipartFile? audio,
+    int? audioDuration,
   }) async {
     try {
       final formData = FormData.fromMap({
         'content': content,
         if (replyToId != null) 'reply_to': replyToId,
         if (images != null && images.isNotEmpty) 'images': images,
+        if (audio != null) 'audio': audio,
+        if (audio != null) 'audio_duration': audioDuration ?? 0,
       });
       final r = await _dio.post(Endpoints.communityMessages(slug), data: formData);
       final root = r.data;
@@ -164,12 +168,14 @@ class CommunityRepository {
     }
   }
 
-  Future<DirectMessage> postSupportMessage(String content, {int? replyToId, List<MultipartFile>? images}) async {
+  Future<DirectMessage> postSupportMessage(String content, {int? replyToId, List<MultipartFile>? images, MultipartFile? audio, int? audioDuration}) async {
     try {
       final formData = FormData.fromMap({
         'content': content,
         if (replyToId != null) 'reply_to': replyToId,
         if (images != null && images.isNotEmpty) 'images': images,
+        if (audio != null) 'audio': audio,
+        if (audio != null) 'audio_duration': audioDuration ?? 0,
       });
       final r = await _dio.post(Endpoints.communitySupport, data: formData);
       final root = r.data as Map<String, dynamic>? ?? {};
@@ -207,12 +213,14 @@ class CommunityRepository {
     }
   }
 
-  Future<DirectMessage> postConversationMessage(int convId, String content, {int? replyToId, List<MultipartFile>? images}) async {
+  Future<DirectMessage> postConversationMessage(int convId, String content, {int? replyToId, List<MultipartFile>? images, MultipartFile? audio, int? audioDuration}) async {
     try {
       final formData = FormData.fromMap({
         'content': content,
         if (replyToId != null) 'reply_to': replyToId,
         if (images != null && images.isNotEmpty) 'images': images,
+        if (audio != null) 'audio': audio,
+        if (audio != null) 'audio_duration': audioDuration ?? 0,
       });
       final r = await _dio.post(Endpoints.communitySupportConversationPost(convId), data: formData);
       final root = r.data as Map<String, dynamic>? ?? {};

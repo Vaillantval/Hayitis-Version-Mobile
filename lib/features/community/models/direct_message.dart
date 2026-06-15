@@ -6,7 +6,7 @@ part 'direct_message.g.dart';
 class DmReplyTo with _$DmReplyTo {
   const factory DmReplyTo({
     required int id,
-    @JsonKey(name: 'sender_name') @Default('') String senderName,
+    @JsonKey(name: 'sender') @Default('') String senderName,
     @Default('') String excerpt,
   }) = _DmReplyTo;
   factory DmReplyTo.fromJson(Map<String, dynamic> json) => _$DmReplyToFromJson(json);
@@ -21,6 +21,8 @@ class DirectMessage with _$DirectMessage {
     @JsonKey(name: 'is_admin') @Default(false) bool isAdmin,
     @JsonKey(name: 'created_at') required DateTime createdAt,
     @JsonKey(name: 'reply_to') DmReplyTo? replyTo,
+    String? audio,
+    @JsonKey(name: 'audio_duration') @Default(0) int audioDuration,
     @Default([]) List<String> attachments,
   }) = _DirectMessage;
   factory DirectMessage.fromJson(Map<String, dynamic> json) => _$DirectMessageFromJson(json);
