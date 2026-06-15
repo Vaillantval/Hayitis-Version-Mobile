@@ -146,11 +146,11 @@ class HomeScreen extends ConsumerWidget {
 
             // ── Section Communauté ──────────────────────────────────────────
             SliverToBoxAdapter(child: _CommunitySectionHeader(
-              onJoin: () => context.push('/community'),
+              onJoin: () => context.go('/community'),
             )),
             const SliverToBoxAdapter(child: SizedBox(height: 14)),
             SliverToBoxAdapter(child: _CommunityInviteCard(
-              onTap: () => context.push('/community'),
+              onTap: () => context.go('/community'),
             )),
 
             const SliverToBoxAdapter(child: SizedBox(height: 28)),
@@ -158,7 +158,7 @@ class HomeScreen extends ConsumerWidget {
             // ── Témoignages ─────────────────────────────────────────────────
             SliverToBoxAdapter(child: _SectionHeader(
               title: 'Ce qu\'ils en disent',
-              onSeeAll: () => context.push('/community'),
+              onSeeAll: () => context.go('/community'),
             )),
             const SliverToBoxAdapter(child: SizedBox(height: 4)),
             const SliverToBoxAdapter(child: _TestimonialCarousel()),
@@ -208,7 +208,7 @@ class _StickyHeaderDelegate extends SliverPersistentHeaderDelegate {
           const Spacer(),
           _TopBtn(icon: Icons.search_rounded, onTap: () => context.push('/shop')),
           const SizedBox(width: 8),
-          _TopBtn(icon: Icons.notifications_none_rounded, onTap: () => context.push('/community')),
+          _TopBtn(icon: Icons.notifications_none_rounded, onTap: () => context.go('/community')),
           const SizedBox(width: 8),
           _CartBtn(count: cartCount, onTap: () => context.push('/cart')),
         ]),

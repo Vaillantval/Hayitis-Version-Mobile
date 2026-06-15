@@ -57,7 +57,7 @@ class SupportScreen extends ConsumerWidget {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () => context.push('/login?redirect=/community/support'),
+                  onPressed: () => context.push('/auth/login?redirect=/community/support'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,

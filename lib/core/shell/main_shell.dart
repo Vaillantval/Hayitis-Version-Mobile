@@ -219,7 +219,7 @@ class _ExpandedFab extends StatelessWidget {
         _FabOption(
           icon: Icons.groups_outlined,
           label: 'Communauté',
-          onTap: () { onClose(); context.push('/community'); },
+          onTap: () { onClose(); context.go('/community'); },
         ),
         const SizedBox(height: 14),
         // Bouton fermer
