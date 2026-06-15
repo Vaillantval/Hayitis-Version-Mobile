@@ -529,9 +529,7 @@ class _SupportComposer extends StatefulWidget {
 class _SupportComposerState extends State<_SupportComposer> {
   bool _showEmoji   = false;
   bool _isRecording = false;
-  bool _cancelRec   = false;
   int  _recSeconds  = 0;
-  double _dragX     = 0;
   final _focusNode  = FocusNode();
   final _recorder   = FlutterSoundRecorder();
   Timer? _recTimer;
@@ -594,7 +592,7 @@ class _SupportComposerState extends State<_SupportComposer> {
       return;
     }
     if (!mounted) { await _recorder.stopRecorder(); await _recorder.closeRecorder(); return; }
-    setState(() { _isRecording = true; _cancelRec = false; _recSeconds = 0; _dragX = 0; _showEmoji = false; });
+    setState(() { _isRecording = true; _recSeconds = 0; _showEmoji = false; });
     _recTimer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (mounted) setState(() => _recSeconds++);
     });
@@ -607,7 +605,7 @@ class _SupportComposerState extends State<_SupportComposer> {
     final path = await _recorder.stopRecorder();
     await _recorder.closeRecorder();
     final duration = _recSeconds;
-    if (mounted) setState(() { _isRecording = false; _cancelRec = false; _recSeconds = 0; _dragX = 0; });
+    if (mounted) setState(() { _isRecording = false; _recSeconds = 0; });
     if (path != null && widget.onAudioSend != null) await widget.onAudioSend!(path, duration);
   }
 
@@ -616,7 +614,7 @@ class _SupportComposerState extends State<_SupportComposer> {
     _maxTimer?.cancel();
     final path = await _recorder.stopRecorder();
     await _recorder.closeRecorder();
-    if (mounted) setState(() { _isRecording = false; _cancelRec = false; _recSeconds = 0; _dragX = 0; });
+    if (mounted) setState(() { _isRecording = false; _recSeconds = 0; });
     if (path != null) try { File(path).deleteSync(); } catch (_) {}
   }
 
@@ -661,7 +659,6 @@ class _SupportComposerState extends State<_SupportComposer> {
   }
 
   Widget _buildRecordingRow() {
-    final cancelled = _dragX < -70;
     return Row(children: [
       GestureDetector(
         onTap: _cancelRecording,
@@ -681,10 +678,8 @@ class _SupportComposerState extends State<_SupportComposer> {
             Text(_fmtSec(_recSeconds),
               style: GoogleFonts.nunito(fontSize: 14, color: AppColors.dark, fontWeight: FontWeight.w600)),
             const Spacer(),
-            Text(
-              cancelled ? 'Annuler' : '← Glisser pour annuler',
-              style: GoogleFonts.nunito(fontSize: 11, color: cancelled ? AppColors.error : AppColors.textMuted),
-            ),
+            Text('Enregistrement...',
+              style: GoogleFonts.nunito(fontSize: 11, color: AppColors.textMuted)),
           ]),
         ),
       ),
@@ -751,17 +746,7 @@ class _SupportComposerState extends State<_SupportComposer> {
         )
       else
         GestureDetector(
-          onLongPressStart: (_) => _startRecording(),
-          onLongPressMoveUpdate: (d) {
-            if (!_isRecording) return;
-            setState(() => _dragX = d.localOffsetFromOrigin.dx);
-            if (_dragX < -70 && !_cancelRec) setState(() => _cancelRec = true);
-            if (_dragX >= -70 && _cancelRec)  setState(() => _cancelRec = false);
-          },
-          onLongPressEnd: (_) {
-            if (!_isRecording) return;
-            if (_cancelRec) _cancelRecording(); else _stopAndSend();
-          },
+          onTap: _startRecording,
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 150),
             width: 42, height: 42,
