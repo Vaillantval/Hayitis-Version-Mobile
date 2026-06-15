@@ -18,7 +18,7 @@ class MsgProduct with _$MsgProduct {
 class MsgReplyTo with _$MsgReplyTo {
   const factory MsgReplyTo({
     required int id,
-    @JsonKey(name: 'author_name') @Default('') String authorName,
+    @JsonKey(name: 'author') @Default('') String authorName,
     @Default('') String excerpt,
   }) = _MsgReplyTo;
   factory MsgReplyTo.fromJson(Map<String, dynamic> json) => _$MsgReplyToFromJson(json);
@@ -30,10 +30,10 @@ class CommunityMessage with _$CommunityMessage {
     required int id,
     // content can be null on soft-deleted messages
     @Default('') String content,
-    @JsonKey(name: 'author_name')  @Default('') String authorName,
+    @JsonKey(name: 'author')       @Default('') String authorName,
     @JsonKey(name: 'created_at')   required DateTime createdAt,
     @JsonKey(name: 'is_pinned')    @Default(false) bool isPinned,
-    @JsonKey(name: 'is_deleted')   @Default(false) bool isDeleted,
+    @JsonKey(name: 'deleted')      @Default(false) bool isDeleted,
     @JsonKey(name: 'is_staff')     @Default(false) bool isStaff,
     @JsonKey(name: 'is_own')       @Default(false) bool isOwn,
     @JsonKey(name: 'can_moderate') @Default(false) bool canModerate,

@@ -27,14 +27,14 @@ Map<String, dynamic> _$$MsgProductImplToJson(_$MsgProductImpl instance) =>
 _$MsgReplyToImpl _$$MsgReplyToImplFromJson(Map<String, dynamic> json) =>
     _$MsgReplyToImpl(
       id: (json['id'] as num).toInt(),
-      authorName: json['author_name'] as String? ?? '',
+      authorName: json['author'] as String? ?? '',
       excerpt: json['excerpt'] as String? ?? '',
     );
 
 Map<String, dynamic> _$$MsgReplyToImplToJson(_$MsgReplyToImpl instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'author_name': instance.authorName,
+      'author': instance.authorName,
       'excerpt': instance.excerpt,
     };
 
@@ -43,10 +43,10 @@ _$CommunityMessageImpl _$$CommunityMessageImplFromJson(
 ) => _$CommunityMessageImpl(
   id: (json['id'] as num).toInt(),
   content: json['content'] as String? ?? '',
-  authorName: json['author_name'] as String? ?? '',
+  authorName: json['author'] as String? ?? '',
   createdAt: DateTime.parse(json['created_at'] as String),
   isPinned: json['is_pinned'] as bool? ?? false,
-  isDeleted: json['is_deleted'] as bool? ?? false,
+  isDeleted: json['deleted'] as bool? ?? false,
   isStaff: json['is_staff'] as bool? ?? false,
   isOwn: json['is_own'] as bool? ?? false,
   canModerate: json['can_moderate'] as bool? ?? false,
@@ -82,10 +82,10 @@ Map<String, dynamic> _$$CommunityMessageImplToJson(
 ) => <String, dynamic>{
   'id': instance.id,
   'content': instance.content,
-  'author_name': instance.authorName,
+  'author': instance.authorName,
   'created_at': instance.createdAt.toIso8601String(),
   'is_pinned': instance.isPinned,
-  'is_deleted': instance.isDeleted,
+  'deleted': instance.isDeleted,
   'is_staff': instance.isStaff,
   'is_own': instance.isOwn,
   'can_moderate': instance.canModerate,

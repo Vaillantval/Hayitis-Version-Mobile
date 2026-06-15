@@ -478,7 +478,7 @@ class __$$DirectMessageImplCopyWithImpl<$Res>
 class _$DirectMessageImpl implements _DirectMessage {
   const _$DirectMessageImpl({
     required this.id,
-    required this.content,
+    this.content = '',
     @JsonKey(name: 'is_own') this.isOwn = false,
     @JsonKey(name: 'is_admin') this.isAdmin = false,
     @JsonKey(name: 'created_at') required this.createdAt,
@@ -494,6 +494,7 @@ class _$DirectMessageImpl implements _DirectMessage {
   @override
   final int id;
   @override
+  @JsonKey()
   final String content;
   @override
   @JsonKey(name: 'is_own')
@@ -579,7 +580,7 @@ class _$DirectMessageImpl implements _DirectMessage {
 abstract class _DirectMessage implements DirectMessage {
   const factory _DirectMessage({
     required final int id,
-    required final String content,
+    final String content,
     @JsonKey(name: 'is_own') final bool isOwn,
     @JsonKey(name: 'is_admin') final bool isAdmin,
     @JsonKey(name: 'created_at') required final DateTime createdAt,

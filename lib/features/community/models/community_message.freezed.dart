@@ -267,7 +267,7 @@ MsgReplyTo _$MsgReplyToFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$MsgReplyTo {
   int get id => throw _privateConstructorUsedError;
-  @JsonKey(name: 'author_name')
+  @JsonKey(name: 'author')
   String get authorName => throw _privateConstructorUsedError;
   String get excerpt => throw _privateConstructorUsedError;
 
@@ -290,7 +290,7 @@ abstract class $MsgReplyToCopyWith<$Res> {
   @useResult
   $Res call({
     int id,
-    @JsonKey(name: 'author_name') String authorName,
+    @JsonKey(name: 'author') String authorName,
     String excerpt,
   });
 }
@@ -348,7 +348,7 @@ abstract class _$$MsgReplyToImplCopyWith<$Res>
   @useResult
   $Res call({
     int id,
-    @JsonKey(name: 'author_name') String authorName,
+    @JsonKey(name: 'author') String authorName,
     String excerpt,
   });
 }
@@ -398,7 +398,7 @@ class __$$MsgReplyToImplCopyWithImpl<$Res>
 class _$MsgReplyToImpl implements _MsgReplyTo {
   const _$MsgReplyToImpl({
     required this.id,
-    @JsonKey(name: 'author_name') this.authorName = '',
+    @JsonKey(name: 'author') this.authorName = '',
     this.excerpt = '',
   });
 
@@ -408,7 +408,7 @@ class _$MsgReplyToImpl implements _MsgReplyTo {
   @override
   final int id;
   @override
-  @JsonKey(name: 'author_name')
+  @JsonKey(name: 'author')
   final String authorName;
   @override
   @JsonKey()
@@ -451,7 +451,7 @@ class _$MsgReplyToImpl implements _MsgReplyTo {
 abstract class _MsgReplyTo implements MsgReplyTo {
   const factory _MsgReplyTo({
     required final int id,
-    @JsonKey(name: 'author_name') final String authorName,
+    @JsonKey(name: 'author') final String authorName,
     final String excerpt,
   }) = _$MsgReplyToImpl;
 
@@ -461,7 +461,7 @@ abstract class _MsgReplyTo implements MsgReplyTo {
   @override
   int get id;
   @override
-  @JsonKey(name: 'author_name')
+  @JsonKey(name: 'author')
   String get authorName;
   @override
   String get excerpt;
@@ -483,13 +483,13 @@ mixin _$CommunityMessage {
   int get id =>
       throw _privateConstructorUsedError; // content can be null on soft-deleted messages
   String get content => throw _privateConstructorUsedError;
-  @JsonKey(name: 'author_name')
+  @JsonKey(name: 'author')
   String get authorName => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
   DateTime get createdAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'is_pinned')
   bool get isPinned => throw _privateConstructorUsedError;
-  @JsonKey(name: 'is_deleted')
+  @JsonKey(name: 'deleted')
   bool get isDeleted => throw _privateConstructorUsedError;
   @JsonKey(name: 'is_staff')
   bool get isStaff => throw _privateConstructorUsedError;
@@ -529,10 +529,10 @@ abstract class $CommunityMessageCopyWith<$Res> {
   $Res call({
     int id,
     String content,
-    @JsonKey(name: 'author_name') String authorName,
+    @JsonKey(name: 'author') String authorName,
     @JsonKey(name: 'created_at') DateTime createdAt,
     @JsonKey(name: 'is_pinned') bool isPinned,
-    @JsonKey(name: 'is_deleted') bool isDeleted,
+    @JsonKey(name: 'deleted') bool isDeleted,
     @JsonKey(name: 'is_staff') bool isStaff,
     @JsonKey(name: 'is_own') bool isOwn,
     @JsonKey(name: 'can_moderate') bool canModerate,
@@ -709,10 +709,10 @@ abstract class _$$CommunityMessageImplCopyWith<$Res>
   $Res call({
     int id,
     String content,
-    @JsonKey(name: 'author_name') String authorName,
+    @JsonKey(name: 'author') String authorName,
     @JsonKey(name: 'created_at') DateTime createdAt,
     @JsonKey(name: 'is_pinned') bool isPinned,
-    @JsonKey(name: 'is_deleted') bool isDeleted,
+    @JsonKey(name: 'deleted') bool isDeleted,
     @JsonKey(name: 'is_staff') bool isStaff,
     @JsonKey(name: 'is_own') bool isOwn,
     @JsonKey(name: 'can_moderate') bool canModerate,
@@ -855,10 +855,10 @@ class _$CommunityMessageImpl implements _CommunityMessage {
   const _$CommunityMessageImpl({
     required this.id,
     this.content = '',
-    @JsonKey(name: 'author_name') this.authorName = '',
+    @JsonKey(name: 'author') this.authorName = '',
     @JsonKey(name: 'created_at') required this.createdAt,
     @JsonKey(name: 'is_pinned') this.isPinned = false,
-    @JsonKey(name: 'is_deleted') this.isDeleted = false,
+    @JsonKey(name: 'deleted') this.isDeleted = false,
     @JsonKey(name: 'is_staff') this.isStaff = false,
     @JsonKey(name: 'is_own') this.isOwn = false,
     @JsonKey(name: 'can_moderate') this.canModerate = false,
@@ -883,7 +883,7 @@ class _$CommunityMessageImpl implements _CommunityMessage {
   @JsonKey()
   final String content;
   @override
-  @JsonKey(name: 'author_name')
+  @JsonKey(name: 'author')
   final String authorName;
   @override
   @JsonKey(name: 'created_at')
@@ -892,7 +892,7 @@ class _$CommunityMessageImpl implements _CommunityMessage {
   @JsonKey(name: 'is_pinned')
   final bool isPinned;
   @override
-  @JsonKey(name: 'is_deleted')
+  @JsonKey(name: 'deleted')
   final bool isDeleted;
   @override
   @JsonKey(name: 'is_staff')
@@ -1028,10 +1028,10 @@ abstract class _CommunityMessage implements CommunityMessage {
   const factory _CommunityMessage({
     required final int id,
     final String content,
-    @JsonKey(name: 'author_name') final String authorName,
+    @JsonKey(name: 'author') final String authorName,
     @JsonKey(name: 'created_at') required final DateTime createdAt,
     @JsonKey(name: 'is_pinned') final bool isPinned,
-    @JsonKey(name: 'is_deleted') final bool isDeleted,
+    @JsonKey(name: 'deleted') final bool isDeleted,
     @JsonKey(name: 'is_staff') final bool isStaff,
     @JsonKey(name: 'is_own') final bool isOwn,
     @JsonKey(name: 'can_moderate') final bool canModerate,
@@ -1052,7 +1052,7 @@ abstract class _CommunityMessage implements CommunityMessage {
   @override
   String get content;
   @override
-  @JsonKey(name: 'author_name')
+  @JsonKey(name: 'author')
   String get authorName;
   @override
   @JsonKey(name: 'created_at')
@@ -1061,7 +1061,7 @@ abstract class _CommunityMessage implements CommunityMessage {
   @JsonKey(name: 'is_pinned')
   bool get isPinned;
   @override
-  @JsonKey(name: 'is_deleted')
+  @JsonKey(name: 'deleted')
   bool get isDeleted;
   @override
   @JsonKey(name: 'is_staff')

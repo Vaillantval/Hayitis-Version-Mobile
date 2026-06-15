@@ -23,7 +23,7 @@ Map<String, dynamic> _$$DmReplyToImplToJson(_$DmReplyToImpl instance) =>
 _$DirectMessageImpl _$$DirectMessageImplFromJson(Map<String, dynamic> json) =>
     _$DirectMessageImpl(
       id: (json['id'] as num).toInt(),
-      content: json['content'] as String,
+      content: json['content'] as String? ?? '',
       isOwn: json['is_own'] as bool? ?? false,
       isAdmin: json['is_admin'] as bool? ?? false,
       createdAt: DateTime.parse(json['created_at'] as String),
