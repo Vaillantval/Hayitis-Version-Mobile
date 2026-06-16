@@ -5,10 +5,22 @@ import 'package:go_router/go_router.dart';
 import '../../features/auth/providers/auth_provider.dart';
 import '../../features/cart/providers/cart_provider.dart';
 import '../theme/app_colors.dart';
+import '../utils/mic_permission.dart';
 
-class MainShell extends ConsumerWidget {
+class MainShell extends ConsumerStatefulWidget {
   final Widget child;
   const MainShell({super.key, required this.child});
+
+  @override
+  ConsumerState<MainShell> createState() => _MainShellState();
+}
+
+class _MainShellState extends ConsumerState<MainShell> {
+  @override
+  void initState() {
+    super.initState();
+    requestMicPermissionOnEntry();
+  }
 
   int _selectedIndex(BuildContext context) {
     final location = GoRouterState.of(context).matchedLocation;
@@ -21,7 +33,7 @@ class MainShell extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final cartCount  = ref.watch(cartCountProvider);
     final isStaff    = ref.watch(authProvider).profile?.isStaff ?? false;
     final index      = _selectedIndex(context);
@@ -29,7 +41,7 @@ class MainShell extends ConsumerWidget {
     final hideFab    = isStaff || location.startsWith('/community');
 
     return Scaffold(
-      body: child,
+      body: widget.child,
 
       // ── FAB Contact admin ──────────────────────────────────────────────
       floatingActionButton: hideFab ? null : _SupportFab(),

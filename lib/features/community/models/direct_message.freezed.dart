@@ -247,6 +247,7 @@ mixin _$DirectMessage {
   @JsonKey(name: 'audio_duration')
   int get audioDuration => throw _privateConstructorUsedError;
   List<String> get attachments => throw _privateConstructorUsedError;
+  bool? get read => throw _privateConstructorUsedError;
 
   /// Serializes this DirectMessage to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -275,6 +276,7 @@ abstract class $DirectMessageCopyWith<$Res> {
     String? audio,
     @JsonKey(name: 'audio_duration') int audioDuration,
     List<String> attachments,
+    bool? read,
   });
 
   $DmReplyToCopyWith<$Res>? get replyTo;
@@ -304,6 +306,7 @@ class _$DirectMessageCopyWithImpl<$Res, $Val extends DirectMessage>
     Object? audio = freezed,
     Object? audioDuration = null,
     Object? attachments = null,
+    Object? read = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -352,6 +355,11 @@ class _$DirectMessageCopyWithImpl<$Res, $Val extends DirectMessage>
                     ? _value.attachments
                     : attachments // ignore: cast_nullable_to_non_nullable
                         as List<String>,
+            read:
+                freezed == read
+                    ? _value.read
+                    : read // ignore: cast_nullable_to_non_nullable
+                        as bool?,
           )
           as $Val,
     );
@@ -391,6 +399,7 @@ abstract class _$$DirectMessageImplCopyWith<$Res>
     String? audio,
     @JsonKey(name: 'audio_duration') int audioDuration,
     List<String> attachments,
+    bool? read,
   });
 
   @override
@@ -420,6 +429,7 @@ class __$$DirectMessageImplCopyWithImpl<$Res>
     Object? audio = freezed,
     Object? audioDuration = null,
     Object? attachments = null,
+    Object? read = freezed,
   }) {
     return _then(
       _$DirectMessageImpl(
@@ -468,6 +478,11 @@ class __$$DirectMessageImplCopyWithImpl<$Res>
                 ? _value._attachments
                 : attachments // ignore: cast_nullable_to_non_nullable
                     as List<String>,
+        read:
+            freezed == read
+                ? _value.read
+                : read // ignore: cast_nullable_to_non_nullable
+                    as bool?,
       ),
     );
   }
@@ -486,6 +501,7 @@ class _$DirectMessageImpl implements _DirectMessage {
     this.audio,
     @JsonKey(name: 'audio_duration') this.audioDuration = 0,
     final List<String> attachments = const [],
+    this.read,
   }) : _attachments = attachments;
 
   factory _$DirectMessageImpl.fromJson(Map<String, dynamic> json) =>
@@ -523,8 +539,11 @@ class _$DirectMessageImpl implements _DirectMessage {
   }
 
   @override
+  final bool? read;
+
+  @override
   String toString() {
-    return 'DirectMessage(id: $id, content: $content, isOwn: $isOwn, isAdmin: $isAdmin, createdAt: $createdAt, replyTo: $replyTo, audio: $audio, audioDuration: $audioDuration, attachments: $attachments)';
+    return 'DirectMessage(id: $id, content: $content, isOwn: $isOwn, isAdmin: $isAdmin, createdAt: $createdAt, replyTo: $replyTo, audio: $audio, audioDuration: $audioDuration, attachments: $attachments, read: $read)';
   }
 
   @override
@@ -545,7 +564,8 @@ class _$DirectMessageImpl implements _DirectMessage {
             const DeepCollectionEquality().equals(
               other._attachments,
               _attachments,
-            ));
+            ) &&
+            (identical(other.read, read) || other.read == read));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -561,6 +581,7 @@ class _$DirectMessageImpl implements _DirectMessage {
     audio,
     audioDuration,
     const DeepCollectionEquality().hash(_attachments),
+    read,
   );
 
   /// Create a copy of DirectMessage
@@ -588,6 +609,7 @@ abstract class _DirectMessage implements DirectMessage {
     final String? audio,
     @JsonKey(name: 'audio_duration') final int audioDuration,
     final List<String> attachments,
+    final bool? read,
   }) = _$DirectMessageImpl;
 
   factory _DirectMessage.fromJson(Map<String, dynamic> json) =
@@ -616,6 +638,8 @@ abstract class _DirectMessage implements DirectMessage {
   int get audioDuration;
   @override
   List<String> get attachments;
+  @override
+  bool? get read;
 
   /// Create a copy of DirectMessage
   /// with the given fields replaced by the non-null parameter values.

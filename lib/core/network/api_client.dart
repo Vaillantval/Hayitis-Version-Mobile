@@ -1,5 +1,6 @@
 // lib/core/network/api_client.dart
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart' show kReleaseMode;
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'auth_interceptor.dart';
 import 'endpoints.dart';
@@ -27,13 +28,15 @@ class ApiClient {
 
     dio.interceptors.addAll([
       AuthInterceptor(dio),
-      PrettyDioLogger(
-        requestHeader: false,
-        requestBody: true,
-        responseBody: true,
-        responseHeader: false,
-        compact: true,
-      ),
+      // Never log request/response bodies (credentials, tokens) in release builds.
+      if (!kReleaseMode)
+        PrettyDioLogger(
+          requestHeader: false,
+          requestBody: true,
+          responseBody: true,
+          responseHeader: false,
+          compact: true,
+        ),
     ]);
 
     return dio;

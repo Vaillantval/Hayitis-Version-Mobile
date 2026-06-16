@@ -38,6 +38,7 @@ _$DirectMessageImpl _$$DirectMessageImplFromJson(Map<String, dynamic> json) =>
               ?.map((e) => e as String)
               .toList() ??
           const [],
+      read: json['read'] as bool?,
     );
 
 Map<String, dynamic> _$$DirectMessageImplToJson(_$DirectMessageImpl instance) =>
@@ -51,6 +52,7 @@ Map<String, dynamic> _$$DirectMessageImplToJson(_$DirectMessageImpl instance) =>
       'audio': instance.audio,
       'audio_duration': instance.audioDuration,
       'attachments': instance.attachments,
+      'read': instance.read,
     };
 
 _$SupportConversationImpl _$$SupportConversationImplFromJson(

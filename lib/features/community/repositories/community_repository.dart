@@ -133,7 +133,7 @@ class CommunityRepository {
       final list = _extractList(r.data);
       return (
         notifications: list.map((e) => CommunityNotification.fromJson(e as Map<String, dynamic>)).toList(),
-        unreadCount: root['unread_count'] as int? ?? 0,
+        unreadCount: root['unread'] as int? ?? 0,
       );
     } on DioException catch (e) {
       throw _toApiException(e);
@@ -150,6 +150,86 @@ class CommunityRepository {
   }
 
   // ── Support DM ──────────────────────────────────────────────────────────────
+
+  // Poll community messages — also returns current typing names
+  Future<({List<CommunityMessage> messages, List<String> typing})> pollMessages(
+      String slug, {required int after}) async {
+    try {
+      final r = await _dio.get(
+        Endpoints.communityMessages(slug),
+        queryParameters: {'after': after},
+      );
+      final root = r.data is Map<String, dynamic> ? r.data as Map<String, dynamic> : <String, dynamic>{};
+      return (
+        messages: _extractList(r.data)
+            .map((e) => CommunityMessage.fromJson(e as Map<String, dynamic>))
+            .toList(),
+        typing: (root['typing'] as List?)?.map((e) => e.toString()).toList() ?? [],
+      );
+    } on DioException catch (e) {
+      throw _toApiException(e);
+    }
+  }
+
+  // Poll support messages — also returns read_ids and typing
+  Future<({List<DirectMessage> messages, List<int> readIds, List<String> typing})>
+      pollSupportMessages({int? after}) async {
+    try {
+      final r = await _dio.get(
+        Endpoints.communitySupport,
+        queryParameters: after != null ? {'after': after} : null,
+      );
+      final root = r.data is Map<String, dynamic> ? r.data as Map<String, dynamic> : <String, dynamic>{};
+      return (
+        messages: _extractList(r.data)
+            .map((e) => DirectMessage.fromJson(e as Map<String, dynamic>))
+            .toList(),
+        readIds: (root['read_ids'] as List?)?.map((e) => e as int).toList() ?? [],
+        typing: (root['typing'] as List?)?.map((e) => e.toString()).toList() ?? [],
+      );
+    } on DioException catch (e) {
+      throw _toApiException(e);
+    }
+  }
+
+  Future<void> sendTyping(String slug) async {
+    try { await _dio.post(Endpoints.communityTyping(slug)); } catch (_) {}
+  }
+
+  Future<void> sendSupportTyping({int? convId}) async {
+    try {
+      await _dio.post(convId != null
+          ? Endpoints.communitySupportConvTyping(convId)
+          : Endpoints.communitySupportTyping);
+    } catch (_) {}
+  }
+
+  Future<Map<String, dynamic>> getReaders(int pk) async {
+    try {
+      final r = await _dio.get(Endpoints.communityReaders(pk));
+      return r.data as Map<String, dynamic>? ?? {};
+    } on DioException catch (e) {
+      throw _toApiException(e);
+    }
+  }
+
+  Future<bool> getReadReceipts() async {
+    try {
+      final r = await _dio.get(Endpoints.communityReadReceipts);
+      return (r.data as Map<String, dynamic>?)?['enabled'] as bool? ?? true;
+    } on DioException catch (e) {
+      throw _toApiException(e);
+    }
+  }
+
+  Future<bool> setReadReceipts(bool on) async {
+    try {
+      final r = await _dio.post(Endpoints.communityReadReceipts, data: {'enabled': on});
+      return (r.data as Map<String, dynamic>?)?['enabled'] as bool? ?? on;
+    } on DioException catch (e) {
+      throw _toApiException(e);
+    }
+  }
 
   Future<List<DirectMessage>> getSupportMessages({int? after, int? before}) async {
     try {
@@ -208,6 +288,27 @@ class CommunityRepository {
       return _extractList(r.data)
           .map((e) => DirectMessage.fromJson(e as Map<String, dynamic>))
           .toList();
+    } on DioException catch (e) {
+      throw _toApiException(e);
+    }
+  }
+
+  // Admin per-conversation polling — also returns read_ids and typing
+  Future<({List<DirectMessage> messages, List<int> readIds, List<String> typing})>
+      pollConversationMessages(int convId, {int? after}) async {
+    try {
+      final r = await _dio.get(
+        Endpoints.communitySupportConversationFeed(convId),
+        queryParameters: after != null ? {'after': after} : null,
+      );
+      final root = r.data is Map<String, dynamic> ? r.data as Map<String, dynamic> : <String, dynamic>{};
+      return (
+        messages: _extractList(r.data)
+            .map((e) => DirectMessage.fromJson(e as Map<String, dynamic>))
+            .toList(),
+        readIds: (root['read_ids'] as List?)?.map((e) => e as int).toList() ?? [],
+        typing: (root['typing'] as List?)?.map((e) => e.toString()).toList() ?? [],
+      );
     } on DioException catch (e) {
       throw _toApiException(e);
     }

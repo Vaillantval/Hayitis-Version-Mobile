@@ -9,11 +9,13 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/mic_permission.dart';
 import '../../../features/auth/providers/auth_provider.dart';
 import '../../../shared/widgets/audio_message_bubble.dart';
 import '../../../shared/widgets/full_screen_image_viewer.dart';
 import '../models/community_message.dart';
 import '../providers/community_provider.dart';
+import '../repositories/community_repository.dart';
 
 const _kAccent = AppColors.primary;
 const _kCream  = AppColors.background;
@@ -464,6 +466,12 @@ class _ChannelFeedState extends ConsumerState<_ChannelFeed> {
         onCancel: () => setState(() { _replyToId = null; _replyAuthor = null; }),
       ),
 
+      // Typing indicator
+      if ((ref.watch(channelFeedProvider(widget.channel.slug)).valueOrNull?.typing ?? []).isNotEmpty)
+        _TypingBubble(
+          names: ref.watch(channelFeedProvider(widget.channel.slug)).valueOrNull!.typing,
+        ),
+
       // Composer
       _Composer(
         channel: widget.channel,
@@ -475,6 +483,7 @@ class _ChannelFeedState extends ConsumerState<_ChannelFeed> {
         isSending: ref.watch(channelFeedProvider(widget.channel.slug)).valueOrNull?.isSending ?? false,
         hasPendingImages: _pendingImages.isNotEmpty,
         onAudioRecorded: _sendAudio,
+        onTyping: () => ref.read(communityRepositoryProvider).sendTyping(widget.channel.slug as String),
       ),
     ]);
   }
@@ -657,11 +666,23 @@ class _MessageBubble extends ConsumerWidget {
                   ),
                 ),
 
-                // Timestamp
+                // Timestamp + readers button (staff only)
                 Padding(
                   padding: const EdgeInsets.only(top: 2, left: 4, right: 4),
-                  child: Text(_formatTime(message.createdAt),
-                    style: GoogleFonts.nunito(fontSize: 10, color: AppColors.textMuted)),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(_formatTime(message.createdAt),
+                        style: GoogleFonts.nunito(fontSize: 10, color: AppColors.textMuted)),
+                      if (message.isStaff && message.canModerate) ...[
+                        const SizedBox(width: 4),
+                        GestureDetector(
+                          onTap: () => _showReaders(context, ref),
+                          child: const Icon(Icons.remove_red_eye_outlined, size: 12, color: AppColors.textMuted),
+                        ),
+                      ],
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -673,6 +694,41 @@ class _MessageBubble extends ConsumerWidget {
         ],
       ),
     )); // Padding + Dismissible
+  }
+
+  void _showReaders(BuildContext context, WidgetRef ref) async {
+    try {
+      final data = await ref.read(communityRepositoryProvider).getReaders(message.id);
+      final readers = (data['readers'] as List?)
+          ?.map((e) => (e as Map<String, dynamic>)['name']?.toString() ?? '')
+          .toList() ?? [];
+      if (!context.mounted) return;
+      showModalBottomSheet(
+        context: context,
+        backgroundColor: AppColors.background,
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+        builder: (_) => Padding(
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+          child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text('Vu par (${readers.length})',
+              style: GoogleFonts.nunito(fontWeight: FontWeight.w700, fontSize: 16, color: AppColors.dark)),
+            const SizedBox(height: 12),
+            if (readers.isEmpty)
+              Text('Personne n\'a encore lu ce message.',
+                style: GoogleFonts.nunito(fontSize: 14, color: AppColors.textMuted))
+            else
+              ...readers.map((name) => Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Row(children: [
+                  const Icon(Icons.check_circle_outline, size: 16, color: _kAccent),
+                  const SizedBox(width: 8),
+                  Text(name, style: GoogleFonts.nunito(fontSize: 14, color: AppColors.dark)),
+                ]),
+              )),
+          ]),
+        ),
+      );
+    } catch (_) {}
   }
 
   void _showActions(BuildContext context) {
@@ -701,6 +757,70 @@ class _MessageBubble extends ConsumerWidget {
       return '${local.hour.toString().padLeft(2, '0')}:${local.minute.toString().padLeft(2, '0')}';
     }
     return '${local.day}/${local.month} ${local.hour.toString().padLeft(2, '0')}:${local.minute.toString().padLeft(2, '0')}';
+  }
+}
+
+class _TypingBubble extends StatelessWidget {
+  final List<String> names;
+  const _TypingBubble({required this.names});
+
+  @override
+  Widget build(BuildContext context) {
+    final label = names.length == 1
+        ? '${names[0]} est en train d\'écrire...'
+        : '${names.length} personnes écrivent...';
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      color: AppColors.background,
+      child: Row(children: [
+        const SizedBox(
+          width: 28, height: 14,
+          child: _TypingDots(),
+        ),
+        const SizedBox(width: 6),
+        Text(label, style: GoogleFonts.nunito(fontSize: 11, color: AppColors.textMuted, fontStyle: FontStyle.italic)),
+      ]),
+    );
+  }
+}
+
+class _TypingDots extends StatefulWidget {
+  const _TypingDots();
+  @override
+  State<_TypingDots> createState() => _TypingDotsState();
+}
+
+class _TypingDotsState extends State<_TypingDots> with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 900))..repeat();
+  }
+
+  @override
+  void dispose() { _ctrl.dispose(); super.dispose(); }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _ctrl,
+      builder: (_, __) => Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: List.generate(3, (i) {
+          final phase = (_ctrl.value - i * 0.2).clamp(0.0, 1.0);
+          final opacity = (phase < 0.5 ? phase * 2 : (1 - phase) * 2).clamp(0.3, 1.0);
+          return Container(
+            width: 6, height: 6,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: AppColors.textMuted.withValues(alpha: opacity),
+            ),
+          );
+        }),
+      ),
+    );
   }
 }
 
@@ -1004,6 +1124,7 @@ class _Composer extends StatefulWidget {
   final bool isSending;
   final bool hasPendingImages;
   final Future<void> Function(String path, int duration) onAudioRecorded;
+  final VoidCallback? onTyping;
 
   const _Composer({
     required this.channel,
@@ -1015,6 +1136,7 @@ class _Composer extends StatefulWidget {
     required this.isSending,
     required this.hasPendingImages,
     required this.onAudioRecorded,
+    this.onTyping,
   });
 
   @override
@@ -1027,6 +1149,7 @@ class _ComposerState extends State<_Composer> {
   int  _recSeconds  = 0;
   Timer? _recTimer;
   Timer? _maxTimer;
+  Timer? _typingTimer;
   String? _recPath;
 
   @override
@@ -1044,13 +1167,27 @@ class _ComposerState extends State<_Composer> {
     }
   }
 
-  void _onTextChanged() => setState(() {});
+  void _onTextChanged() {
+    setState(() {});
+    if (widget.onTyping != null && widget.textCtrl.text.trim().isNotEmpty) {
+      if (_typingTimer == null) {
+        widget.onTyping!();
+        _typingTimer = Timer.periodic(const Duration(seconds: 3), (_) {
+          if (mounted && widget.textCtrl.text.trim().isNotEmpty) widget.onTyping!();
+        });
+      }
+    } else {
+      _typingTimer?.cancel();
+      _typingTimer = null;
+    }
+  }
 
   @override
   void dispose() {
     widget.textCtrl.removeListener(_onTextChanged);
     _recTimer?.cancel();
     _maxTimer?.cancel();
+    _typingTimer?.cancel();
     if (_isRecording) {
       _recorder.stopRecorder().then((p) {
         if (p != null) try { File(p).deleteSync(); } catch (_) {}
@@ -1061,9 +1198,13 @@ class _ComposerState extends State<_Composer> {
   }
 
   Future<void> _startRecording() async {
+    if (!await ensureMicPermission(context)) return;
+    if (!mounted) return;
     try {
       await _recorder.openRecorder();
-    } catch (_) {
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Microphone indisponible ($e). Vérifiez la permission micro dans les paramètres."), backgroundColor: AppColors.error));
       return;
     }
     if (!mounted) { await _recorder.closeRecorder(); return; }
@@ -1071,8 +1212,10 @@ class _ComposerState extends State<_Composer> {
     _recPath = '${dir.path}/audio_${DateTime.now().millisecondsSinceEpoch}.m4a';
     try {
       await _recorder.startRecorder(toFile: _recPath!, codec: Codec.aacMP4);
-    } catch (_) {
+    } catch (e) {
       await _recorder.closeRecorder();
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Erreur d'enregistrement: $e"), backgroundColor: AppColors.error));
       return;
     }
     if (!mounted) { await _recorder.stopRecorder(); await _recorder.closeRecorder(); return; }
@@ -1086,9 +1229,19 @@ class _ComposerState extends State<_Composer> {
   Future<void> _stopAndSend() async {
     _recTimer?.cancel();
     _maxTimer?.cancel();
-    final path = await _recorder.stopRecorder();
-    await _recorder.closeRecorder();
     final duration = _recSeconds;
+    String? path;
+    try {
+      path = await _recorder.stopRecorder();
+      await _recorder.closeRecorder();
+    } catch (e) {
+      if (mounted) {
+        setState(() { _isRecording = false; _recSeconds = 0; });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Erreur d'enregistrement: $e"), backgroundColor: AppColors.error));
+      }
+      return;
+    }
     if (mounted) setState(() { _isRecording = false; _recSeconds = 0; });
     if (path != null) await widget.onAudioRecorded(path, duration);
   }

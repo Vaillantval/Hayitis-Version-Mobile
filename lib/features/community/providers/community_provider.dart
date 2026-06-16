@@ -24,12 +24,14 @@ class ChannelFeedState {
   final bool isLoadingOlder;
   final bool hasOlder;
   final bool isSending;
+  final List<String> typing;
 
   const ChannelFeedState({
     this.messages = const [],
     this.isLoadingOlder = false,
     this.hasOlder = false,
     this.isSending = false,
+    this.typing = const [],
   });
 
   ChannelFeedState copyWith({
@@ -37,11 +39,13 @@ class ChannelFeedState {
     bool? isLoadingOlder,
     bool? hasOlder,
     bool? isSending,
+    List<String>? typing,
   }) => ChannelFeedState(
     messages:        messages        ?? this.messages,
     isLoadingOlder:  isLoadingOlder  ?? this.isLoadingOlder,
     hasOlder:        hasOlder        ?? this.hasOlder,
     isSending:       isSending       ?? this.isSending,
+    typing:          typing          ?? this.typing,
   );
 }
 
@@ -78,17 +82,24 @@ class ChannelFeedNotifier extends AutoDisposeFamilyAsyncNotifier<ChannelFeedStat
   }
 
   Future<void> _poll() async {
-    if (_lastId == null) return;
+    final lastId = _lastId;
+    if (lastId == null) return;
     try {
-      final newer = await _repo.getMessages(_slug, after: _lastId);
-      if (newer.isEmpty) return;
-      _lastId = newer.last.id;
+      final result = await _repo.pollMessages(_slug, after: lastId);
       final current = state.valueOrNull;
-      if (current != null) {
+      if (current == null) return;
+      if (result.messages.isNotEmpty) {
+        _lastId = result.messages.last.id;
         final existing = current.messages.map((m) => m.id).toSet();
-        final fresh = newer.where((m) => !existing.contains(m.id)).toList();
-        if (fresh.isEmpty) return;
-        state = AsyncData(current.copyWith(messages: [...current.messages, ...fresh]));
+        final fresh = result.messages.where((m) => !existing.contains(m.id)).toList();
+        state = AsyncData(current.copyWith(
+          messages: fresh.isNotEmpty ? [...current.messages, ...fresh] : null,
+          typing: result.typing,
+        ));
+      } else {
+        if (result.typing != current.typing) {
+          state = AsyncData(current.copyWith(typing: result.typing));
+        }
       }
     } catch (_) {}
   }
@@ -240,9 +251,23 @@ final notifProvider = AsyncNotifierProvider.autoDispose<NotifNotifier, NotifStat
 class SupportFeedState {
   final List<DirectMessage> messages;
   final bool isSending;
-  const SupportFeedState({this.messages = const [], this.isSending = false});
-  SupportFeedState copyWith({List<DirectMessage>? messages, bool? isSending}) =>
-      SupportFeedState(messages: messages ?? this.messages, isSending: isSending ?? this.isSending);
+  final List<String> typing;
+
+  const SupportFeedState({
+    this.messages = const [],
+    this.isSending = false,
+    this.typing = const [],
+  });
+
+  SupportFeedState copyWith({
+    List<DirectMessage>? messages,
+    bool? isSending,
+    List<String>? typing,
+  }) => SupportFeedState(
+    messages: messages ?? this.messages,
+    isSending: isSending ?? this.isSending,
+    typing: typing ?? this.typing,
+  );
 }
 
 class SupportFeedNotifier extends AutoDisposeAsyncNotifier<SupportFeedState> {
@@ -262,16 +287,23 @@ class SupportFeedNotifier extends AutoDisposeAsyncNotifier<SupportFeedState> {
 
   Future<void> _poll() async {
     try {
-      final newer = await _repo.getSupportMessages(after: _lastId);
-      if (newer.isEmpty) return;
-      _lastId = newer.last.id;
+      final result = await _repo.pollSupportMessages(after: _lastId);
       final current = state.valueOrNull;
-      if (current != null) {
-        final existing = current.messages.map((m) => m.id).toSet();
-        final fresh = newer.where((m) => !existing.contains(m.id)).toList();
-        if (fresh.isEmpty) return;
-        state = AsyncData(current.copyWith(messages: [...current.messages, ...fresh]));
-      }
+      if (current == null) return;
+      if (result.messages.isNotEmpty) _lastId = result.messages.last.id;
+      final existing = current.messages.map((m) => m.id).toSet();
+      final fresh = result.messages.where((m) => !existing.contains(m.id)).toList();
+      final readSet = result.readIds.toSet();
+      // Apply readIds: mark matched admin messages as read (✓✓)
+      final allMsgs = [
+        ...current.messages.map((m) =>
+            readSet.contains(m.id) && m.read != true ? m.copyWith(read: true) : m),
+        ...fresh,
+      ];
+      state = AsyncData(current.copyWith(
+        messages: allMsgs,
+        typing: result.typing,
+      ));
     } catch (_) {}
   }
 

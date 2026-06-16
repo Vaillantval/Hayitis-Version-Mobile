@@ -24,6 +24,7 @@ class DirectMessage with _$DirectMessage {
     String? audio,
     @JsonKey(name: 'audio_duration') @Default(0) int audioDuration,
     @Default([]) List<String> attachments,
+    bool? read,
   }) = _DirectMessage;
   factory DirectMessage.fromJson(Map<String, dynamic> json) => _$DirectMessageFromJson(json);
 }

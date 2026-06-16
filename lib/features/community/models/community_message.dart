@@ -9,6 +9,7 @@ class MsgProduct with _$MsgProduct {
     @Default('') String name,
     @Default('') String slug,
     @Default('') String image,
+    // Backend always sends a pre-formatted display string (e.g. "1 500.00 G"), never a raw number.
     @Default('') String price,
   }) = _MsgProduct;
   factory MsgProduct.fromJson(Map<String, dynamic> json) => _$MsgProductFromJson(json);
@@ -30,10 +31,10 @@ class CommunityMessage with _$CommunityMessage {
     required int id,
     // content can be null on soft-deleted messages
     @Default('') String content,
-    @JsonKey(name: 'author')       @Default('') String authorName,
+    @JsonKey(name: 'author_name')  @Default('') String authorName,
     @JsonKey(name: 'created_at')   required DateTime createdAt,
     @JsonKey(name: 'is_pinned')    @Default(false) bool isPinned,
-    @JsonKey(name: 'deleted')      @Default(false) bool isDeleted,
+    @JsonKey(name: 'is_deleted')   @Default(false) bool isDeleted,
     @JsonKey(name: 'is_staff')     @Default(false) bool isStaff,
     @JsonKey(name: 'is_own')       @Default(false) bool isOwn,
     @JsonKey(name: 'can_moderate') @Default(false) bool canModerate,

@@ -14,6 +14,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/mic_permission.dart';
 import '../../../features/auth/providers/auth_provider.dart';
 import '../models/direct_message.dart';
 import '../providers/community_provider.dart';
@@ -101,6 +102,18 @@ class _ClientSupportViewState extends ConsumerState<_ClientSupportView> {
   int?    _replyToId;
   String? _replyAuthor;
   String? _replySnippet;
+  bool? _readReceipts;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      try {
+        final on = await ref.read(communityRepositoryProvider).getReadReceipts();
+        if (mounted) setState(() => _readReceipts = on);
+      } catch (_) {}
+    });
+  }
 
   @override
   void dispose() {
@@ -175,6 +188,26 @@ class _ClientSupportViewState extends ConsumerState<_ClientSupportView> {
           ]),
         ]),
         iconTheme: const IconThemeData(color: Colors.white),
+        actions: [
+          if (_readReceipts != null)
+            IconButton(
+              tooltip: _readReceipts! ? 'Accusés de lecture activés' : 'Accusés de lecture désactivés',
+              icon: Icon(
+                _readReceipts! ? Icons.visibility_rounded : Icons.visibility_off_rounded,
+                color: _readReceipts! ? Colors.white : Colors.white38,
+                size: 20,
+              ),
+              onPressed: () async {
+                final newVal = !_readReceipts!;
+                setState(() => _readReceipts = newVal);
+                try {
+                  await ref.read(communityRepositoryProvider).setReadReceipts(newVal);
+                } catch (_) {
+                  if (mounted) setState(() => _readReceipts = !newVal);
+                }
+              },
+            ),
+        ],
       ),
       body: Column(children: [
         Expanded(
@@ -220,6 +253,12 @@ class _ClientSupportViewState extends ConsumerState<_ClientSupportView> {
             onCancel: () => setState(() { _replyToId = null; _replyAuthor = null; _replySnippet = null; }),
           ),
 
+        // Typing indicator
+        if ((ref.watch(supportFeedProvider).valueOrNull?.typing ?? []).isNotEmpty)
+          _SupportTypingBubble(
+            names: ref.watch(supportFeedProvider).valueOrNull!.typing,
+          ),
+
         _ImagePreviewStrip(
           images: _pendingImages,
           onRemove: (i) => setState(() => _pendingImages.removeAt(i)),
@@ -232,6 +271,7 @@ class _ClientSupportViewState extends ConsumerState<_ClientSupportView> {
           isSending: feedAsync.valueOrNull?.isSending ?? false,
           hasPendingImages: _pendingImages.isNotEmpty,
           onAudioSend: _sendAudio,
+          onTyping: () => ref.read(communityRepositoryProvider).sendSupportTyping(),
         ),
       ]),
     );
@@ -336,11 +376,14 @@ class _AdminConversationViewState extends ConsumerState<_AdminConversationView> 
   final _picker     = ImagePicker();
   final List<XFile> _pendingImages = [];
   List<DirectMessage> _messages = [];
+  List<String> _typing = [];
   bool _loading = true;
   bool _sending = false;
   int?    _replyToId;
   String? _replyAuthor;
   String? _replySnippet;
+  int? _lastId;
+  Timer? _pollTimer;
 
   @override
   void initState() {
@@ -350,12 +393,39 @@ class _AdminConversationViewState extends ConsumerState<_AdminConversationView> 
 
   Future<void> _loadMessages() async {
     try {
-      final msgs = await ref.read(communityRepositoryProvider).getConversationMessages(widget.conv.id);
-      if (mounted) setState(() { _messages = msgs; _loading = false; });
+      final result = await ref.read(communityRepositoryProvider).pollConversationMessages(widget.conv.id);
+      final readSet = result.readIds.toSet();
+      final msgs = result.messages.map((m) => readSet.contains(m.id) ? m.copyWith(read: true) : m).toList();
+      if (msgs.isNotEmpty) _lastId = msgs.last.id;
+      if (mounted) setState(() { _messages = msgs; _typing = result.typing; _loading = false; });
       WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
+      _pollTimer = Timer.periodic(const Duration(seconds: 4), (_) => _poll());
     } catch (_) {
       if (mounted) setState(() => _loading = false);
     }
+  }
+
+  Future<void> _poll() async {
+    final lastId = _lastId;
+    if (lastId == null) return;
+    try {
+      final result = await ref.read(communityRepositoryProvider)
+          .pollConversationMessages(widget.conv.id, after: lastId);
+      if (!mounted) return;
+      final readSet = result.readIds.toSet();
+      final existing = _messages.map((m) => m.id).toSet();
+      final fresh = result.messages.where((m) => !existing.contains(m.id)).toList();
+      if (fresh.isNotEmpty) _lastId = fresh.last.id;
+      setState(() {
+        _messages = [
+          ..._messages.map((m) =>
+              readSet.contains(m.id) && m.read != true ? m.copyWith(read: true) : m),
+          ...fresh,
+        ];
+        _typing = result.typing;
+      });
+      if (fresh.isNotEmpty) WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
+    } catch (_) {}
   }
 
   void _scrollToBottom() {
@@ -439,6 +509,7 @@ class _AdminConversationViewState extends ConsumerState<_AdminConversationView> 
             snippet: _replySnippet ?? '',
             onCancel: () => setState(() { _replyToId = null; _replyAuthor = null; _replySnippet = null; }),
           ),
+        if (_typing.isNotEmpty) _SupportTypingBubble(names: _typing),
         _ImagePreviewStrip(
           images: _pendingImages,
           onRemove: (i) => setState(() => _pendingImages.removeAt(i)),
@@ -450,6 +521,7 @@ class _AdminConversationViewState extends ConsumerState<_AdminConversationView> 
           isSending: _sending,
           hasPendingImages: _pendingImages.isNotEmpty,
           onAudioSend: _sendAudio,
+          onTyping: () => ref.read(communityRepositoryProvider).sendSupportTyping(convId: widget.conv.id),
         ),
       ]),
     );
@@ -457,6 +529,7 @@ class _AdminConversationViewState extends ConsumerState<_AdminConversationView> 
 
   @override
   void dispose() {
+    _pollTimer?.cancel();
     _textCtrl.dispose();
     _scrollCtrl.dispose();
     super.dispose();
@@ -512,6 +585,7 @@ class _SupportComposer extends StatefulWidget {
   final bool isSending;
   final bool hasPendingImages;
   final Future<void> Function(String path, int duration)? onAudioSend;
+  final VoidCallback? onTyping;
 
   const _SupportComposer({
     required this.textCtrl,
@@ -520,6 +594,7 @@ class _SupportComposer extends StatefulWidget {
     required this.isSending,
     this.hasPendingImages = false,
     this.onAudioSend,
+    this.onTyping,
   });
 
   @override
@@ -534,6 +609,7 @@ class _SupportComposerState extends State<_SupportComposer> {
   final _recorder   = FlutterSoundRecorder();
   Timer? _recTimer;
   Timer? _maxTimer;
+  Timer? _typingTimer;
   String? _recPath;
 
   @override
@@ -554,7 +630,20 @@ class _SupportComposerState extends State<_SupportComposer> {
     }
   }
 
-  void _onTextChanged() => setState(() {});
+  void _onTextChanged() {
+    setState(() {});
+    if (widget.onTyping != null && widget.textCtrl.text.trim().isNotEmpty) {
+      if (_typingTimer == null) {
+        widget.onTyping!();
+        _typingTimer = Timer.periodic(const Duration(seconds: 3), (_) {
+          if (mounted && widget.textCtrl.text.trim().isNotEmpty) widget.onTyping!();
+        });
+      }
+    } else {
+      _typingTimer?.cancel();
+      _typingTimer = null;
+    }
+  }
 
   @override
   void dispose() {
@@ -562,6 +651,7 @@ class _SupportComposerState extends State<_SupportComposer> {
     _focusNode.dispose();
     _recTimer?.cancel();
     _maxTimer?.cancel();
+    _typingTimer?.cancel();
     if (_isRecording) {
       _recorder.stopRecorder().then((p) {
         if (p != null) try { File(p).deleteSync(); } catch (_) {}
@@ -577,9 +667,13 @@ class _SupportComposerState extends State<_SupportComposer> {
   }
 
   Future<void> _startRecording() async {
+    if (!await ensureMicPermission(context)) return;
+    if (!mounted) return;
     try {
       await _recorder.openRecorder();
-    } catch (_) {
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Microphone indisponible ($e). Vérifiez la permission micro dans les paramètres."), backgroundColor: AppColors.error));
       return;
     }
     if (!mounted) { await _recorder.closeRecorder(); return; }
@@ -587,8 +681,10 @@ class _SupportComposerState extends State<_SupportComposer> {
     _recPath = '${dir.path}/audio_${DateTime.now().millisecondsSinceEpoch}.m4a';
     try {
       await _recorder.startRecorder(toFile: _recPath!, codec: Codec.aacMP4);
-    } catch (_) {
+    } catch (e) {
       await _recorder.closeRecorder();
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Erreur d'enregistrement: $e"), backgroundColor: AppColors.error));
       return;
     }
     if (!mounted) { await _recorder.stopRecorder(); await _recorder.closeRecorder(); return; }
@@ -602,9 +698,19 @@ class _SupportComposerState extends State<_SupportComposer> {
   Future<void> _stopAndSend() async {
     _recTimer?.cancel();
     _maxTimer?.cancel();
-    final path = await _recorder.stopRecorder();
-    await _recorder.closeRecorder();
     final duration = _recSeconds;
+    String? path;
+    try {
+      path = await _recorder.stopRecorder();
+      await _recorder.closeRecorder();
+    } catch (e) {
+      if (mounted) {
+        setState(() { _isRecording = false; _recSeconds = 0; });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Erreur d'enregistrement: $e"), backgroundColor: AppColors.error));
+      }
+      return;
+    }
     if (mounted) setState(() { _isRecording = false; _recSeconds = 0; });
     if (path != null && widget.onAudioSend != null) await widget.onAudioSend!(path, duration);
   }
@@ -758,6 +864,41 @@ class _SupportComposerState extends State<_SupportComposer> {
   }
 }
 
+class _SupportTypingBubble extends StatelessWidget {
+  final List<String> names;
+  const _SupportTypingBubble({required this.names});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
+      child: Row(children: [
+        CircleAvatar(
+          radius: 12,
+          backgroundColor: AppColors.dark,
+          child: const Icon(Icons.support_agent_rounded, size: 12, color: Colors.white),
+        ),
+        const SizedBox(width: 8),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(16), topRight: Radius.circular(16),
+              bottomLeft: Radius.circular(4), bottomRight: Radius.circular(16),
+            ),
+            boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 4)],
+          ),
+          child: Text(
+            names.length == 1 ? "${names[0]} est en train d'écrire..." : "L'équipe est en train d'écrire...",
+            style: GoogleFonts.nunito(fontSize: 11, color: AppColors.textMuted, fontStyle: FontStyle.italic),
+          ),
+        ),
+      ]),
+    );
+  }
+}
+
 class _DMBubble extends StatelessWidget {
   final DirectMessage msg;
   final bool adminView;
@@ -823,8 +964,18 @@ class _DMBubble extends StatelessWidget {
                   )),
                 ],
                 const SizedBox(height: 2),
-                Text(_fmtTime(msg.createdAt),
-                  style: GoogleFonts.nunito(fontSize: 9, color: _isRight ? Colors.white60 : AppColors.textMuted)),
+                Row(mainAxisSize: MainAxisSize.min, children: [
+                  Text(_fmtTime(msg.createdAt),
+                    style: GoogleFonts.nunito(fontSize: 9, color: _isRight ? Colors.white60 : AppColors.textMuted)),
+                  if (_isRight && msg.read != null) ...[
+                    const SizedBox(width: 3),
+                    Icon(
+                      msg.read! ? Icons.done_all_rounded : Icons.done_rounded,
+                      size: 11,
+                      color: msg.read! ? Colors.lightBlue[200] : Colors.white54,
+                    ),
+                  ],
+                ]),
               ]),
             ),
           ),

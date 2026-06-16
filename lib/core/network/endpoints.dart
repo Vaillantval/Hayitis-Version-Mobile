@@ -95,6 +95,11 @@ class Endpoints {
   static const String communitySupportInbox              = '/community/support/inbox/';
   static String communitySupportConversationFeed(int id) => '/community/support/inbox/$id/messages/';
   static String communitySupportConversationPost(int id) => '/community/support/inbox/$id/messages/';
+  static String communityTyping(String slug)            => '/community/channels/$slug/typing/';
+  static String communityReaders(int pk)                => '/community/messages/$pk/readers/';
+  static const String communityReadReceipts             = '/community/settings/read-receipts/';
+  static const String communitySupportTyping            = '/community/support/typing/';
+  static String communitySupportConvTyping(int id)      => '/community/support/inbox/$id/typing/';
 
   // Routes publiques (pas d'injection du token)
   static const List<String> publicRoutes = [
