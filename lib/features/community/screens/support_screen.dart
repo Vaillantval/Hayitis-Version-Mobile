@@ -891,7 +891,7 @@ class _SupportTypingBubble extends StatelessWidget {
           ),
           child: Text(
             names.length == 1 ? "${names[0]} est en train d'écrire..." : "L'équipe est en train d'écrire...",
-            style: GoogleFonts.nunito(fontSize: 11, color: AppColors.textMuted, fontStyle: FontStyle.italic),
+            style: GoogleFonts.nunito(fontSize: 11, color: AppColors.success, fontStyle: FontStyle.italic, fontWeight: FontWeight.w600),
           ),
         ),
       ]),

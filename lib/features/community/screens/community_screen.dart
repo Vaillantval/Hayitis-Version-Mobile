@@ -778,7 +778,7 @@ class _TypingBubble extends StatelessWidget {
           child: _TypingDots(),
         ),
         const SizedBox(width: 6),
-        Text(label, style: GoogleFonts.nunito(fontSize: 11, color: AppColors.textMuted, fontStyle: FontStyle.italic)),
+        Text(label, style: GoogleFonts.nunito(fontSize: 11, color: AppColors.success, fontStyle: FontStyle.italic, fontWeight: FontWeight.w600)),
       ]),
     );
   }
