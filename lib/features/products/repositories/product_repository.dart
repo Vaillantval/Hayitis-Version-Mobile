@@ -95,6 +95,18 @@ class ProductRepository {
     }
   }
 
+  Future<List<Product>> getRelated(String slug) async {
+    try {
+      final response = await _dio.get(Endpoints.productRelated(slug));
+      final data = response.data as Map<String, dynamic>;
+      return (data['results'] as List)
+          .map((e) => Product.fromJson(e as Map<String, dynamic>))
+          .toList();
+    } on DioException catch (_) {
+      return [];
+    }
+  }
+
   Future<List<Category>> getCategories() async {
     try {
       final response = await _dio.get(Endpoints.categories);

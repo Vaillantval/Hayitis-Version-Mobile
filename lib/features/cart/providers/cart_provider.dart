@@ -20,8 +20,8 @@ class CartNotifier extends StateNotifier<AsyncValue<Cart?>> {
     state = await AsyncValue.guard(() => _repo.getCart());
   }
 
-  Future<void> addItem(int productId, int quantity) async {
-    final cart = await _repo.addToCart(productId, quantity);
+  Future<void> addItem(int productId, int quantity, {int? priceId}) async {
+    final cart = await _repo.addToCart(productId, quantity, priceId: priceId);
     state = AsyncValue.data(cart);
   }
 

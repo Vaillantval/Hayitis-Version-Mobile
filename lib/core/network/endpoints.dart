@@ -20,7 +20,8 @@ class Endpoints {
   static const String featured       = '/products/featured/';
   static const String newArrivals    = '/products/new-arrivals/';
   static const String onSale         = '/products/on-sale/';
-  static String productDetail(String slug) => '/products/$slug/';
+  static String productDetail(String slug)   => '/products/$slug/';
+  static String productRelated(String slug)  => '/products/$slug/related/';
 
   // Categories
   static const String categories     = '/categories/';

@@ -57,6 +57,7 @@ mixin _$ProductDetail {
   List<CategoryBrief> get categories => throw _privateConstructorUsedError;
   @JsonKey(name: 'updated_at')
   DateTime get updatedAt => throw _privateConstructorUsedError;
+  List<ProductPrice> get prices => throw _privateConstructorUsedError;
 
   /// Serializes this ProductDetail to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -99,6 +100,7 @@ abstract class $ProductDetailCopyWith<$Res> {
     @JsonKey(name: 'is_special_offer') bool isSpecialOffer,
     List<CategoryBrief> categories,
     @JsonKey(name: 'updated_at') DateTime updatedAt,
+    List<ProductPrice> prices,
   });
 
   $CategoryBriefCopyWith<$Res>? get category;
@@ -142,6 +144,7 @@ class _$ProductDetailCopyWithImpl<$Res, $Val extends ProductDetail>
     Object? isSpecialOffer = null,
     Object? categories = null,
     Object? updatedAt = null,
+    Object? prices = null,
   }) {
     return _then(
       _value.copyWith(
@@ -260,6 +263,11 @@ class _$ProductDetailCopyWithImpl<$Res, $Val extends ProductDetail>
                     ? _value.updatedAt
                     : updatedAt // ignore: cast_nullable_to_non_nullable
                         as DateTime,
+            prices:
+                null == prices
+                    ? _value.prices
+                    : prices // ignore: cast_nullable_to_non_nullable
+                        as List<ProductPrice>,
           )
           as $Val,
     );
@@ -313,6 +321,7 @@ abstract class _$$ProductDetailImplCopyWith<$Res>
     @JsonKey(name: 'is_special_offer') bool isSpecialOffer,
     List<CategoryBrief> categories,
     @JsonKey(name: 'updated_at') DateTime updatedAt,
+    List<ProductPrice> prices,
   });
 
   @override
@@ -356,6 +365,7 @@ class __$$ProductDetailImplCopyWithImpl<$Res>
     Object? isSpecialOffer = null,
     Object? categories = null,
     Object? updatedAt = null,
+    Object? prices = null,
   }) {
     return _then(
       _$ProductDetailImpl(
@@ -474,6 +484,11 @@ class __$$ProductDetailImplCopyWithImpl<$Res>
                 ? _value.updatedAt
                 : updatedAt // ignore: cast_nullable_to_non_nullable
                     as DateTime,
+        prices:
+            null == prices
+                ? _value._prices
+                : prices // ignore: cast_nullable_to_non_nullable
+                    as List<ProductPrice>,
       ),
     );
   }
@@ -506,8 +521,10 @@ class _$ProductDetailImpl implements _ProductDetail {
     @JsonKey(name: 'is_special_offer') required this.isSpecialOffer,
     required final List<CategoryBrief> categories,
     @JsonKey(name: 'updated_at') required this.updatedAt,
+    final List<ProductPrice> prices = const [],
   }) : _images = images,
-       _categories = categories;
+       _categories = categories,
+       _prices = prices;
 
   factory _$ProductDetailImpl.fromJson(Map<String, dynamic> json) =>
       _$$ProductDetailImplFromJson(json);
@@ -583,10 +600,18 @@ class _$ProductDetailImpl implements _ProductDetail {
   @override
   @JsonKey(name: 'updated_at')
   final DateTime updatedAt;
+  final List<ProductPrice> _prices;
+  @override
+  @JsonKey()
+  List<ProductPrice> get prices {
+    if (_prices is EqualUnmodifiableListView) return _prices;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_prices);
+  }
 
   @override
   String toString() {
-    return 'ProductDetail(id: $id, name: $name, slug: $slug, description: $description, price: $price, compareAtPrice: $compareAtPrice, currency: $currency, images: $images, category: $category, inStock: $inStock, stockQuantity: $stockQuantity, ratingAverage: $ratingAverage, ratingCount: $ratingCount, createdAt: $createdAt, moreDescription: $moreDescription, additionalInfo: $additionalInfo, brand: $brand, isBestSeller: $isBestSeller, isFeatured: $isFeatured, isNewArrival: $isNewArrival, isSpecialOffer: $isSpecialOffer, categories: $categories, updatedAt: $updatedAt)';
+    return 'ProductDetail(id: $id, name: $name, slug: $slug, description: $description, price: $price, compareAtPrice: $compareAtPrice, currency: $currency, images: $images, category: $category, inStock: $inStock, stockQuantity: $stockQuantity, ratingAverage: $ratingAverage, ratingCount: $ratingCount, createdAt: $createdAt, moreDescription: $moreDescription, additionalInfo: $additionalInfo, brand: $brand, isBestSeller: $isBestSeller, isFeatured: $isFeatured, isNewArrival: $isNewArrival, isSpecialOffer: $isSpecialOffer, categories: $categories, updatedAt: $updatedAt, prices: $prices)';
   }
 
   @override
@@ -634,7 +659,8 @@ class _$ProductDetailImpl implements _ProductDetail {
               _categories,
             ) &&
             (identical(other.updatedAt, updatedAt) ||
-                other.updatedAt == updatedAt));
+                other.updatedAt == updatedAt) &&
+            const DeepCollectionEquality().equals(other._prices, _prices));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -664,6 +690,7 @@ class _$ProductDetailImpl implements _ProductDetail {
     isSpecialOffer,
     const DeepCollectionEquality().hash(_categories),
     updatedAt,
+    const DeepCollectionEquality().hash(_prices),
   ]);
 
   /// Create a copy of ProductDetail
@@ -705,6 +732,7 @@ abstract class _ProductDetail implements ProductDetail {
     @JsonKey(name: 'is_special_offer') required final bool isSpecialOffer,
     required final List<CategoryBrief> categories,
     @JsonKey(name: 'updated_at') required final DateTime updatedAt,
+    final List<ProductPrice> prices,
   }) = _$ProductDetailImpl;
 
   factory _ProductDetail.fromJson(Map<String, dynamic> json) =
@@ -769,6 +797,8 @@ abstract class _ProductDetail implements ProductDetail {
   @override
   @JsonKey(name: 'updated_at')
   DateTime get updatedAt;
+  @override
+  List<ProductPrice> get prices;
 
   /// Create a copy of ProductDetail
   /// with the given fields replaced by the non-null parameter values.

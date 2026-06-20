@@ -1,6 +1,7 @@
 // lib/features/products/models/product_detail.dart
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'product_image.dart';
+import 'product_price.dart';
 import 'category.dart';
 
 part 'product_detail.freezed.dart';
@@ -32,6 +33,7 @@ class ProductDetail with _$ProductDetail {
     @JsonKey(name: 'is_special_offer')  required bool isSpecialOffer,
     required List<CategoryBrief> categories,
     @JsonKey(name: 'updated_at')        required DateTime updatedAt,
+    @Default([]) List<ProductPrice> prices,
   }) = _ProductDetail;
 
   factory ProductDetail.fromJson(Map<String, dynamic> json) =>

@@ -18,11 +18,12 @@ class CartRepository {
     }
   }
 
-  Future<Cart> addToCart(int productId, int quantity) async {
+  Future<Cart> addToCart(int productId, int quantity, {int? priceId}) async {
     try {
       final response = await _dio.post(Endpoints.cartAdd, data: {
         'product_id': productId,
         'quantity':   quantity,
+        if (priceId != null) 'price_id': priceId,
       });
       final root = response.data as Map<String, dynamic>;
       return Cart.fromJson(root['data'] as Map<String, dynamic>);

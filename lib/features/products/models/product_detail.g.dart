@@ -42,6 +42,11 @@ _$ProductDetailImpl _$$ProductDetailImplFromJson(Map<String, dynamic> json) =>
               .map((e) => CategoryBrief.fromJson(e as Map<String, dynamic>))
               .toList(),
       updatedAt: DateTime.parse(json['updated_at'] as String),
+      prices:
+          (json['prices'] as List<dynamic>?)
+              ?.map((e) => ProductPrice.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
     );
 
 Map<String, dynamic> _$$ProductDetailImplToJson(_$ProductDetailImpl instance) =>
@@ -69,4 +74,5 @@ Map<String, dynamic> _$$ProductDetailImplToJson(_$ProductDetailImpl instance) =>
       'is_special_offer': instance.isSpecialOffer,
       'categories': instance.categories,
       'updated_at': instance.updatedAt.toIso8601String(),
+      'prices': instance.prices,
     };

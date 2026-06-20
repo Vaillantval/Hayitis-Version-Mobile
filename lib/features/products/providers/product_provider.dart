@@ -67,6 +67,10 @@ final productDetailProvider = FutureProvider.family<ProductDetail, String>((ref,
   }
 });
 
+final relatedProductsProvider = FutureProvider.family<List<Product>, String>((ref, slug) {
+  return ref.read(productRepositoryProvider).getRelated(slug);
+});
+
 final searchResultsProvider = FutureProvider.family<List<Product>, String>((ref, query) {
   if (query.isEmpty) return Future.value([]);
   return ref.read(productRepositoryProvider).searchProducts(query);
