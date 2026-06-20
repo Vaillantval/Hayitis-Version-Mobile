@@ -34,19 +34,32 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
   int _quantity = 1;
   int _imageIndex = 0;
   bool _buyingNow = false;
-  late TabController _tabCtrl;
+  TabController? _tabCtrl;
+  int _tabCount = 0;
   ProductPrice? _selectedVariant;
 
   @override
   void initState() {
     super.initState();
-    _tabCtrl = TabController(length: 3, vsync: this);
   }
 
   @override
   void dispose() {
-    _tabCtrl.dispose();
+    _tabCtrl?.dispose();
     super.dispose();
+  }
+
+  // Called once product data is known; safe to call from build via WidgetsBinding.
+  void _maybeRebuildTabs(int newCount) {
+    if (_tabCount == newCount) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      setState(() {
+        _tabCtrl?.dispose();
+        _tabCtrl = TabController(length: newCount, vsync: this);
+        _tabCount = newCount;
+      });
+    });
   }
 
   void _initVariant(ProductDetail product) {
@@ -79,9 +92,10 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
         final relatedAsync  = ref.watch(relatedProductsProvider(widget.slug));
         final isInWishlist  = ref.watch(isInWishlistProvider(product.id));
         final tabCount = 1 + (product.moreDescription != null ? 1 : 0) + (product.additionalInfo != null ? 1 : 0);
-        if (_tabCtrl.length != tabCount) {
-          _tabCtrl.dispose();
-          _tabCtrl = TabController(length: tabCount, vsync: this);
+        _maybeRebuildTabs(tabCount);
+        if (_tabCtrl == null || _tabCount != tabCount) {
+          // Still initializing — show loading until postFrame callback fires.
+          return const Scaffold(body: Center(child: CircularProgressIndicator()));
         }
 
         return Scaffold(
@@ -273,7 +287,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
 
                       // ── Tabs (description / détails / infos) ───────────
                       TabBar(
-                        controller: _tabCtrl,
+                        controller: _tabCtrl!,
                         labelColor: AppColors.primary,
                         unselectedLabelColor: AppColors.textMuted,
                         indicatorColor: AppColors.primary,
@@ -286,7 +300,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
                         ],
                       ),
                       _AnimatedTabView(
-                        controller: _tabCtrl,
+                        controller: _tabCtrl!,
                         children: [
                           _TabContent(product.description),
                           if (product.moreDescription != null) _TabContent(product.moreDescription!),
