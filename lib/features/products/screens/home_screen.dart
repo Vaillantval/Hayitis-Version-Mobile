@@ -46,6 +46,7 @@ class HomeScreen extends ConsumerWidget {
               delegate: _StickyHeaderDelegate(
                 firstName: firstName,
                 cartCount: cartCount,
+                topPadding: MediaQuery.of(context).padding.top,
               ),
             ),
 
@@ -176,20 +177,25 @@ class HomeScreen extends ConsumerWidget {
 class _StickyHeaderDelegate extends SliverPersistentHeaderDelegate {
   final String firstName;
   final int cartCount;
-  const _StickyHeaderDelegate({required this.firstName, required this.cartCount});
+  final double topPadding;
+  const _StickyHeaderDelegate({
+    required this.firstName,
+    required this.cartCount,
+    required this.topPadding,
+  });
 
-  @override double get minExtent => 56;
-  @override double get maxExtent => firstName.isEmpty ? 100 : 120;
+  @override double get minExtent => topPadding + 56;
+  @override double get maxExtent => topPadding + (firstName.isEmpty ? 86 : 106);
 
   @override
   bool shouldRebuild(_StickyHeaderDelegate old) =>
-      old.firstName != firstName || old.cartCount != cartCount;
+      old.firstName != firstName || old.cartCount != cartCount || old.topPadding != topPadding;
 
   @override
   Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
-    final t = (shrinkOffset / maxExtent).clamp(0.0, 1.0);
-    final collapsed = t > 0.6;
-    final top = MediaQuery.of(context).padding.top;
+    final range = (maxExtent - minExtent).clamp(1.0, double.infinity);
+    final t = (shrinkOffset / range).clamp(0.0, 1.0);
+    final collapsed = shrinkOffset >= range * 0.85;
 
     return Container(
       decoration: BoxDecoration(
@@ -198,7 +204,7 @@ class _StickyHeaderDelegate extends SliverPersistentHeaderDelegate {
             ? [BoxShadow(color: Colors.black.withValues(alpha: 0.18), blurRadius: 8, offset: const Offset(0, 2))]
             : null,
       ),
-      padding: EdgeInsets.fromLTRB(20, top + 10, 16, 10),
+      padding: EdgeInsets.fromLTRB(20, topPadding + 10, 16, 10),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         // Top row always visible
         Row(children: [
