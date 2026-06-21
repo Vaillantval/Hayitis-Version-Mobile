@@ -22,15 +22,9 @@ Address _$AddressFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$Address {
   int get id => throw _privateConstructorUsedError;
-  String get name => throw _privateConstructorUsedError;
-  @JsonKey(name: 'full_name')
-  String get fullName => throw _privateConstructorUsedError;
   String get street => throw _privateConstructorUsedError;
-  @JsonKey(name: 'code_postal')
-  String get codePostal => throw _privateConstructorUsedError;
   String get city => throw _privateConstructorUsedError;
-  String get country => throw _privateConstructorUsedError;
-  String get phone => throw _privateConstructorUsedError;
+  String? get phone => throw _privateConstructorUsedError;
   @JsonKey(name: 'more_details')
   String? get moreDetails => throw _privateConstructorUsedError;
   @JsonKey(name: 'adress_type')
@@ -40,7 +34,13 @@ mixin _$Address {
   @JsonKey(name: 'created_at')
   DateTime get createdAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'updated_at')
-  DateTime get updatedAt => throw _privateConstructorUsedError;
+  DateTime get updatedAt => throw _privateConstructorUsedError; // Encore renvoyé par le backend, mais optionnel (retiré du formulaire)
+  @JsonKey(name: 'full_name')
+  String get fullName => throw _privateConstructorUsedError; // Plus renvoyés par le backend — valeurs par défaut pour éviter le crash
+  String get name => throw _privateConstructorUsedError;
+  @JsonKey(name: 'code_postal')
+  String get codePostal => throw _privateConstructorUsedError;
+  String get country => throw _privateConstructorUsedError;
 
   /// Serializes this Address to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -58,18 +58,18 @@ abstract class $AddressCopyWith<$Res> {
   @useResult
   $Res call({
     int id,
-    String name,
-    @JsonKey(name: 'full_name') String fullName,
     String street,
-    @JsonKey(name: 'code_postal') String codePostal,
     String city,
-    String country,
-    String phone,
+    String? phone,
     @JsonKey(name: 'more_details') String? moreDetails,
     @JsonKey(name: 'adress_type') String adressType,
     @JsonKey(name: 'is_default') bool isDefault,
     @JsonKey(name: 'created_at') DateTime createdAt,
     @JsonKey(name: 'updated_at') DateTime updatedAt,
+    @JsonKey(name: 'full_name') String fullName,
+    String name,
+    @JsonKey(name: 'code_postal') String codePostal,
+    String country,
   });
 }
 
@@ -89,18 +89,18 @@ class _$AddressCopyWithImpl<$Res, $Val extends Address>
   @override
   $Res call({
     Object? id = null,
-    Object? name = null,
-    Object? fullName = null,
     Object? street = null,
-    Object? codePostal = null,
     Object? city = null,
-    Object? country = null,
-    Object? phone = null,
+    Object? phone = freezed,
     Object? moreDetails = freezed,
     Object? adressType = null,
     Object? isDefault = null,
     Object? createdAt = null,
     Object? updatedAt = null,
+    Object? fullName = null,
+    Object? name = null,
+    Object? codePostal = null,
+    Object? country = null,
   }) {
     return _then(
       _value.copyWith(
@@ -109,41 +109,21 @@ class _$AddressCopyWithImpl<$Res, $Val extends Address>
                     ? _value.id
                     : id // ignore: cast_nullable_to_non_nullable
                         as int,
-            name:
-                null == name
-                    ? _value.name
-                    : name // ignore: cast_nullable_to_non_nullable
-                        as String,
-            fullName:
-                null == fullName
-                    ? _value.fullName
-                    : fullName // ignore: cast_nullable_to_non_nullable
-                        as String,
             street:
                 null == street
                     ? _value.street
                     : street // ignore: cast_nullable_to_non_nullable
-                        as String,
-            codePostal:
-                null == codePostal
-                    ? _value.codePostal
-                    : codePostal // ignore: cast_nullable_to_non_nullable
                         as String,
             city:
                 null == city
                     ? _value.city
                     : city // ignore: cast_nullable_to_non_nullable
                         as String,
-            country:
-                null == country
-                    ? _value.country
-                    : country // ignore: cast_nullable_to_non_nullable
-                        as String,
             phone:
-                null == phone
+                freezed == phone
                     ? _value.phone
                     : phone // ignore: cast_nullable_to_non_nullable
-                        as String,
+                        as String?,
             moreDetails:
                 freezed == moreDetails
                     ? _value.moreDetails
@@ -169,6 +149,26 @@ class _$AddressCopyWithImpl<$Res, $Val extends Address>
                     ? _value.updatedAt
                     : updatedAt // ignore: cast_nullable_to_non_nullable
                         as DateTime,
+            fullName:
+                null == fullName
+                    ? _value.fullName
+                    : fullName // ignore: cast_nullable_to_non_nullable
+                        as String,
+            name:
+                null == name
+                    ? _value.name
+                    : name // ignore: cast_nullable_to_non_nullable
+                        as String,
+            codePostal:
+                null == codePostal
+                    ? _value.codePostal
+                    : codePostal // ignore: cast_nullable_to_non_nullable
+                        as String,
+            country:
+                null == country
+                    ? _value.country
+                    : country // ignore: cast_nullable_to_non_nullable
+                        as String,
           )
           as $Val,
     );
@@ -185,18 +185,18 @@ abstract class _$$AddressImplCopyWith<$Res> implements $AddressCopyWith<$Res> {
   @useResult
   $Res call({
     int id,
-    String name,
-    @JsonKey(name: 'full_name') String fullName,
     String street,
-    @JsonKey(name: 'code_postal') String codePostal,
     String city,
-    String country,
-    String phone,
+    String? phone,
     @JsonKey(name: 'more_details') String? moreDetails,
     @JsonKey(name: 'adress_type') String adressType,
     @JsonKey(name: 'is_default') bool isDefault,
     @JsonKey(name: 'created_at') DateTime createdAt,
     @JsonKey(name: 'updated_at') DateTime updatedAt,
+    @JsonKey(name: 'full_name') String fullName,
+    String name,
+    @JsonKey(name: 'code_postal') String codePostal,
+    String country,
   });
 }
 
@@ -215,18 +215,18 @@ class __$$AddressImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? id = null,
-    Object? name = null,
-    Object? fullName = null,
     Object? street = null,
-    Object? codePostal = null,
     Object? city = null,
-    Object? country = null,
-    Object? phone = null,
+    Object? phone = freezed,
     Object? moreDetails = freezed,
     Object? adressType = null,
     Object? isDefault = null,
     Object? createdAt = null,
     Object? updatedAt = null,
+    Object? fullName = null,
+    Object? name = null,
+    Object? codePostal = null,
+    Object? country = null,
   }) {
     return _then(
       _$AddressImpl(
@@ -235,41 +235,21 @@ class __$$AddressImplCopyWithImpl<$Res>
                 ? _value.id
                 : id // ignore: cast_nullable_to_non_nullable
                     as int,
-        name:
-            null == name
-                ? _value.name
-                : name // ignore: cast_nullable_to_non_nullable
-                    as String,
-        fullName:
-            null == fullName
-                ? _value.fullName
-                : fullName // ignore: cast_nullable_to_non_nullable
-                    as String,
         street:
             null == street
                 ? _value.street
                 : street // ignore: cast_nullable_to_non_nullable
-                    as String,
-        codePostal:
-            null == codePostal
-                ? _value.codePostal
-                : codePostal // ignore: cast_nullable_to_non_nullable
                     as String,
         city:
             null == city
                 ? _value.city
                 : city // ignore: cast_nullable_to_non_nullable
                     as String,
-        country:
-            null == country
-                ? _value.country
-                : country // ignore: cast_nullable_to_non_nullable
-                    as String,
         phone:
-            null == phone
+            freezed == phone
                 ? _value.phone
                 : phone // ignore: cast_nullable_to_non_nullable
-                    as String,
+                    as String?,
         moreDetails:
             freezed == moreDetails
                 ? _value.moreDetails
@@ -295,6 +275,26 @@ class __$$AddressImplCopyWithImpl<$Res>
                 ? _value.updatedAt
                 : updatedAt // ignore: cast_nullable_to_non_nullable
                     as DateTime,
+        fullName:
+            null == fullName
+                ? _value.fullName
+                : fullName // ignore: cast_nullable_to_non_nullable
+                    as String,
+        name:
+            null == name
+                ? _value.name
+                : name // ignore: cast_nullable_to_non_nullable
+                    as String,
+        codePostal:
+            null == codePostal
+                ? _value.codePostal
+                : codePostal // ignore: cast_nullable_to_non_nullable
+                    as String,
+        country:
+            null == country
+                ? _value.country
+                : country // ignore: cast_nullable_to_non_nullable
+                    as String,
       ),
     );
   }
@@ -305,18 +305,18 @@ class __$$AddressImplCopyWithImpl<$Res>
 class _$AddressImpl implements _Address {
   const _$AddressImpl({
     required this.id,
-    required this.name,
-    @JsonKey(name: 'full_name') required this.fullName,
     required this.street,
-    @JsonKey(name: 'code_postal') required this.codePostal,
     required this.city,
-    required this.country,
-    required this.phone,
+    this.phone,
     @JsonKey(name: 'more_details') this.moreDetails,
     @JsonKey(name: 'adress_type') required this.adressType,
-    @JsonKey(name: 'is_default') required this.isDefault,
+    @JsonKey(name: 'is_default') this.isDefault = false,
     @JsonKey(name: 'created_at') required this.createdAt,
     @JsonKey(name: 'updated_at') required this.updatedAt,
+    @JsonKey(name: 'full_name') this.fullName = '',
+    this.name = '',
+    @JsonKey(name: 'code_postal') this.codePostal = '',
+    this.country = 'Haiti',
   });
 
   factory _$AddressImpl.fromJson(Map<String, dynamic> json) =>
@@ -325,21 +325,11 @@ class _$AddressImpl implements _Address {
   @override
   final int id;
   @override
-  final String name;
-  @override
-  @JsonKey(name: 'full_name')
-  final String fullName;
-  @override
   final String street;
-  @override
-  @JsonKey(name: 'code_postal')
-  final String codePostal;
   @override
   final String city;
   @override
-  final String country;
-  @override
-  final String phone;
+  final String? phone;
   @override
   @JsonKey(name: 'more_details')
   final String? moreDetails;
@@ -355,10 +345,24 @@ class _$AddressImpl implements _Address {
   @override
   @JsonKey(name: 'updated_at')
   final DateTime updatedAt;
+  // Encore renvoyé par le backend, mais optionnel (retiré du formulaire)
+  @override
+  @JsonKey(name: 'full_name')
+  final String fullName;
+  // Plus renvoyés par le backend — valeurs par défaut pour éviter le crash
+  @override
+  @JsonKey()
+  final String name;
+  @override
+  @JsonKey(name: 'code_postal')
+  final String codePostal;
+  @override
+  @JsonKey()
+  final String country;
 
   @override
   String toString() {
-    return 'Address(id: $id, name: $name, fullName: $fullName, street: $street, codePostal: $codePostal, city: $city, country: $country, phone: $phone, moreDetails: $moreDetails, adressType: $adressType, isDefault: $isDefault, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'Address(id: $id, street: $street, city: $city, phone: $phone, moreDetails: $moreDetails, adressType: $adressType, isDefault: $isDefault, createdAt: $createdAt, updatedAt: $updatedAt, fullName: $fullName, name: $name, codePostal: $codePostal, country: $country)';
   }
 
   @override
@@ -367,14 +371,8 @@ class _$AddressImpl implements _Address {
         (other.runtimeType == runtimeType &&
             other is _$AddressImpl &&
             (identical(other.id, id) || other.id == id) &&
-            (identical(other.name, name) || other.name == name) &&
-            (identical(other.fullName, fullName) ||
-                other.fullName == fullName) &&
             (identical(other.street, street) || other.street == street) &&
-            (identical(other.codePostal, codePostal) ||
-                other.codePostal == codePostal) &&
             (identical(other.city, city) || other.city == city) &&
-            (identical(other.country, country) || other.country == country) &&
             (identical(other.phone, phone) || other.phone == phone) &&
             (identical(other.moreDetails, moreDetails) ||
                 other.moreDetails == moreDetails) &&
@@ -385,7 +383,13 @@ class _$AddressImpl implements _Address {
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.updatedAt, updatedAt) ||
-                other.updatedAt == updatedAt));
+                other.updatedAt == updatedAt) &&
+            (identical(other.fullName, fullName) ||
+                other.fullName == fullName) &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.codePostal, codePostal) ||
+                other.codePostal == codePostal) &&
+            (identical(other.country, country) || other.country == country));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -393,18 +397,18 @@ class _$AddressImpl implements _Address {
   int get hashCode => Object.hash(
     runtimeType,
     id,
-    name,
-    fullName,
     street,
-    codePostal,
     city,
-    country,
     phone,
     moreDetails,
     adressType,
     isDefault,
     createdAt,
     updatedAt,
+    fullName,
+    name,
+    codePostal,
+    country,
   );
 
   /// Create a copy of Address
@@ -424,18 +428,18 @@ class _$AddressImpl implements _Address {
 abstract class _Address implements Address {
   const factory _Address({
     required final int id,
-    required final String name,
-    @JsonKey(name: 'full_name') required final String fullName,
     required final String street,
-    @JsonKey(name: 'code_postal') required final String codePostal,
     required final String city,
-    required final String country,
-    required final String phone,
+    final String? phone,
     @JsonKey(name: 'more_details') final String? moreDetails,
     @JsonKey(name: 'adress_type') required final String adressType,
-    @JsonKey(name: 'is_default') required final bool isDefault,
+    @JsonKey(name: 'is_default') final bool isDefault,
     @JsonKey(name: 'created_at') required final DateTime createdAt,
     @JsonKey(name: 'updated_at') required final DateTime updatedAt,
+    @JsonKey(name: 'full_name') final String fullName,
+    final String name,
+    @JsonKey(name: 'code_postal') final String codePostal,
+    final String country,
   }) = _$AddressImpl;
 
   factory _Address.fromJson(Map<String, dynamic> json) = _$AddressImpl.fromJson;
@@ -443,21 +447,11 @@ abstract class _Address implements Address {
   @override
   int get id;
   @override
-  String get name;
-  @override
-  @JsonKey(name: 'full_name')
-  String get fullName;
-  @override
   String get street;
-  @override
-  @JsonKey(name: 'code_postal')
-  String get codePostal;
   @override
   String get city;
   @override
-  String get country;
-  @override
-  String get phone;
+  String? get phone;
   @override
   @JsonKey(name: 'more_details')
   String? get moreDetails;
@@ -472,7 +466,17 @@ abstract class _Address implements Address {
   DateTime get createdAt;
   @override
   @JsonKey(name: 'updated_at')
-  DateTime get updatedAt;
+  DateTime get updatedAt; // Encore renvoyé par le backend, mais optionnel (retiré du formulaire)
+  @override
+  @JsonKey(name: 'full_name')
+  String get fullName; // Plus renvoyés par le backend — valeurs par défaut pour éviter le crash
+  @override
+  String get name;
+  @override
+  @JsonKey(name: 'code_postal')
+  String get codePostal;
+  @override
+  String get country;
 
   /// Create a copy of Address
   /// with the given fields replaced by the non-null parameter values.

@@ -16,12 +16,8 @@ class AddressFormScreen extends ConsumerStatefulWidget {
 }
 
 class _AddressFormScreenState extends ConsumerState<AddressFormScreen> {
-  final _nameCtrl    = TextEditingController();
-  final _fullNameCtrl= TextEditingController();
   final _streetCtrl  = TextEditingController();
   final _cityCtrl    = TextEditingController();
-  final _codeCtrl    = TextEditingController();
-  final _countryCtrl = TextEditingController(text: 'Haiti');
   final _phoneCtrl   = TextEditingController();
   final _detailsCtrl = TextEditingController();
   String _adressType = 'shipping';
@@ -34,13 +30,9 @@ class _AddressFormScreenState extends ConsumerState<AddressFormScreen> {
       final addresses = ref.read(addressProvider).valueOrNull ?? [];
       final addr = addresses.where((a) => a.id == widget.addressId).firstOrNull;
       if (addr != null) {
-        _nameCtrl.text     = addr.name;
-        _fullNameCtrl.text = addr.fullName;
         _streetCtrl.text   = addr.street;
         _cityCtrl.text     = addr.city;
-        _codeCtrl.text     = addr.codePostal;
-        _countryCtrl.text  = addr.country;
-        _phoneCtrl.text    = addr.phone;
+        _phoneCtrl.text    = addr.phone ?? '';
         _detailsCtrl.text  = addr.moreDetails ?? '';
         _adressType        = addr.adressType;
       }
@@ -49,7 +41,7 @@ class _AddressFormScreenState extends ConsumerState<AddressFormScreen> {
 
   @override
   void dispose() {
-    for (final c in [_nameCtrl, _fullNameCtrl, _streetCtrl, _cityCtrl, _codeCtrl, _countryCtrl, _phoneCtrl, _detailsCtrl]) {
+    for (final c in [_streetCtrl, _cityCtrl, _phoneCtrl, _detailsCtrl]) {
       c.dispose();
     }
     super.dispose();
@@ -58,15 +50,11 @@ class _AddressFormScreenState extends ConsumerState<AddressFormScreen> {
   Future<void> _save() async {
     setState(() => _isLoading = true);
     final data = {
-      'name':       _nameCtrl.text.trim(),
-      'full_name':  _fullNameCtrl.text.trim(),
-      'street':     _streetCtrl.text.trim(),
-      'city':       _cityCtrl.text.trim(),
-      'code_postal': _codeCtrl.text.trim(),
-      'country':    _countryCtrl.text.trim(),
-      'phone':      _phoneCtrl.text.trim(),
+      'street':       _streetCtrl.text.trim(),
+      'city':         _cityCtrl.text.trim(),
+      'phone':        _phoneCtrl.text.trim(),
       'more_details': _detailsCtrl.text.trim().isEmpty ? null : _detailsCtrl.text.trim(),
-      'adress_type': _adressType,
+      'adress_type':  _adressType,
     };
     try {
       if (widget.addressId != null) {
@@ -92,19 +80,9 @@ class _AddressFormScreenState extends ConsumerState<AddressFormScreen> {
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(children: [
-          CustomTextField(label: 'Label (ex: Maison)', controller: _nameCtrl),
-          const SizedBox(height: 12),
-          CustomTextField(label: 'Nom du destinataire', controller: _fullNameCtrl),
-          const SizedBox(height: 12),
           CustomTextField(label: 'Rue / Adresse', controller: _streetCtrl),
           const SizedBox(height: 12),
           CustomTextField(label: 'Ville', controller: _cityCtrl),
-          const SizedBox(height: 12),
-          Row(children: [
-            Expanded(child: CustomTextField(label: 'Code postal', controller: _codeCtrl)),
-            const SizedBox(width: 12),
-            Expanded(child: CustomTextField(label: 'Pays', controller: _countryCtrl)),
-          ]),
           const SizedBox(height: 12),
           CustomTextField(label: 'Téléphone', controller: _phoneCtrl, keyboardType: TextInputType.phone),
           const SizedBox(height: 12),

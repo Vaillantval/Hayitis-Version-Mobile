@@ -8,18 +8,20 @@ part 'address.g.dart';
 class Address with _$Address {
   const factory Address({
     required int id,
-    required String name,
-    @JsonKey(name: 'full_name')    required String fullName,
     required String street,
-    @JsonKey(name: 'code_postal')  required String codePostal,
     required String city,
-    required String country,
-    required String phone,
+    String? phone,
     @JsonKey(name: 'more_details') String? moreDetails,
-    @JsonKey(name: 'adress_type') required String adressType,
-    @JsonKey(name: 'is_default')  required bool isDefault,
-    @JsonKey(name: 'created_at')  required DateTime createdAt,
-    @JsonKey(name: 'updated_at')  required DateTime updatedAt,
+    @JsonKey(name: 'adress_type')  required String adressType,
+    @JsonKey(name: 'is_default')   @Default(false) bool isDefault,
+    @JsonKey(name: 'created_at')   required DateTime createdAt,
+    @JsonKey(name: 'updated_at')   required DateTime updatedAt,
+    // Encore renvoyé par le backend, mais optionnel (retiré du formulaire)
+    @JsonKey(name: 'full_name') @Default('') String fullName,
+    // Plus renvoyés par le backend — valeurs par défaut pour éviter le crash
+    @Default('') String name,
+    @JsonKey(name: 'code_postal') @Default('') String codePostal,
+    @Default('Haiti') String country,
   }) = _Address;
 
   factory Address.fromJson(Map<String, dynamic> json) =>
