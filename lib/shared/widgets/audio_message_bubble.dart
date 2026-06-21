@@ -1,5 +1,6 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/app_colors.dart';
 
@@ -24,6 +25,7 @@ class AudioMessageBubble extends StatefulWidget {
 class _AudioMessageBubbleState extends State<AudioMessageBubble> {
   final _player = AudioPlayer();
   bool _playing = false;
+  bool _error = false;
   Duration _position = Duration.zero;
   Duration _total = Duration.zero;
 
@@ -56,15 +58,25 @@ class _AudioMessageBubbleState extends State<AudioMessageBubble> {
       await _player.pause();
       return;
     }
-    if (_position > Duration.zero && _position < _total) {
+    // Resume if paused mid-way
+    if (_position > Duration.zero && _position < _total && !_error) {
       await _player.resume();
       return;
     }
-    _position = Duration.zero;
-    if (widget.url != null) {
-      await _player.play(UrlSource(widget.url!));
-    } else if (widget.localPath != null) {
-      await _player.play(DeviceFileSource(widget.localPath!));
+    // Fresh play
+    if (mounted) setState(() { _position = Duration.zero; _error = false; });
+    try {
+      if (widget.url != null) {
+        await _player.play(UrlSource(widget.url!));
+      } else if (widget.localPath != null) {
+        await _player.play(DeviceFileSource(widget.localPath!));
+      } else {
+        if (mounted) setState(() => _error = true);
+        Fluttertoast.showToast(msg: 'Fichier audio introuvable.');
+      }
+    } catch (e) {
+      if (mounted) setState(() { _error = true; _playing = false; });
+      Fluttertoast.showToast(msg: 'Impossible de lire ce message vocal.');
     }
   }
 
@@ -92,14 +104,19 @@ class _AudioMessageBubbleState extends State<AudioMessageBubble> {
           child: Container(
             width: 36, height: 36,
             decoration: BoxDecoration(
-              color: widget.isOwn
-                  ? Colors.white24
-                  : AppColors.primary.withValues(alpha: 0.12),
+              color: _error
+                  ? AppColors.error.withValues(alpha: 0.15)
+                  : widget.isOwn
+                      ? Colors.white24
+                      : AppColors.primary.withValues(alpha: 0.12),
               shape: BoxShape.circle,
             ),
             child: Icon(
-              _playing ? Icons.pause_rounded : Icons.play_arrow_rounded,
-              color: iconColor, size: 22,
+              _error
+                  ? Icons.error_outline_rounded
+                  : _playing ? Icons.pause_rounded : Icons.play_arrow_rounded,
+              color: _error ? AppColors.error : iconColor,
+              size: 22,
             ),
           ),
         ),
