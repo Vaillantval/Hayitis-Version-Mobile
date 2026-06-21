@@ -25,6 +25,10 @@ mixin _$CartItem {
   Product get product => throw _privateConstructorUsedError;
   int get quantity => throw _privateConstructorUsedError;
   double get subtotal => throw _privateConstructorUsedError;
+  @JsonKey(name: 'unit_price')
+  double? get unitPrice => throw _privateConstructorUsedError;
+  @JsonKey(name: 'price_id')
+  int? get priceId => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
   DateTime get createdAt => throw _privateConstructorUsedError;
 
@@ -48,6 +52,8 @@ abstract class $CartItemCopyWith<$Res> {
     Product product,
     int quantity,
     double subtotal,
+    @JsonKey(name: 'unit_price') double? unitPrice,
+    @JsonKey(name: 'price_id') int? priceId,
     @JsonKey(name: 'created_at') DateTime createdAt,
   });
 
@@ -73,6 +79,8 @@ class _$CartItemCopyWithImpl<$Res, $Val extends CartItem>
     Object? product = null,
     Object? quantity = null,
     Object? subtotal = null,
+    Object? unitPrice = freezed,
+    Object? priceId = freezed,
     Object? createdAt = null,
   }) {
     return _then(
@@ -97,6 +105,16 @@ class _$CartItemCopyWithImpl<$Res, $Val extends CartItem>
                     ? _value.subtotal
                     : subtotal // ignore: cast_nullable_to_non_nullable
                         as double,
+            unitPrice:
+                freezed == unitPrice
+                    ? _value.unitPrice
+                    : unitPrice // ignore: cast_nullable_to_non_nullable
+                        as double?,
+            priceId:
+                freezed == priceId
+                    ? _value.priceId
+                    : priceId // ignore: cast_nullable_to_non_nullable
+                        as int?,
             createdAt:
                 null == createdAt
                     ? _value.createdAt
@@ -132,6 +150,8 @@ abstract class _$$CartItemImplCopyWith<$Res>
     Product product,
     int quantity,
     double subtotal,
+    @JsonKey(name: 'unit_price') double? unitPrice,
+    @JsonKey(name: 'price_id') int? priceId,
     @JsonKey(name: 'created_at') DateTime createdAt,
   });
 
@@ -157,6 +177,8 @@ class __$$CartItemImplCopyWithImpl<$Res>
     Object? product = null,
     Object? quantity = null,
     Object? subtotal = null,
+    Object? unitPrice = freezed,
+    Object? priceId = freezed,
     Object? createdAt = null,
   }) {
     return _then(
@@ -181,6 +203,16 @@ class __$$CartItemImplCopyWithImpl<$Res>
                 ? _value.subtotal
                 : subtotal // ignore: cast_nullable_to_non_nullable
                     as double,
+        unitPrice:
+            freezed == unitPrice
+                ? _value.unitPrice
+                : unitPrice // ignore: cast_nullable_to_non_nullable
+                    as double?,
+        priceId:
+            freezed == priceId
+                ? _value.priceId
+                : priceId // ignore: cast_nullable_to_non_nullable
+                    as int?,
         createdAt:
             null == createdAt
                 ? _value.createdAt
@@ -199,6 +231,8 @@ class _$CartItemImpl implements _CartItem {
     required this.product,
     required this.quantity,
     required this.subtotal,
+    @JsonKey(name: 'unit_price') this.unitPrice,
+    @JsonKey(name: 'price_id') this.priceId,
     @JsonKey(name: 'created_at') required this.createdAt,
   });
 
@@ -214,12 +248,18 @@ class _$CartItemImpl implements _CartItem {
   @override
   final double subtotal;
   @override
+  @JsonKey(name: 'unit_price')
+  final double? unitPrice;
+  @override
+  @JsonKey(name: 'price_id')
+  final int? priceId;
+  @override
   @JsonKey(name: 'created_at')
   final DateTime createdAt;
 
   @override
   String toString() {
-    return 'CartItem(id: $id, product: $product, quantity: $quantity, subtotal: $subtotal, createdAt: $createdAt)';
+    return 'CartItem(id: $id, product: $product, quantity: $quantity, subtotal: $subtotal, unitPrice: $unitPrice, priceId: $priceId, createdAt: $createdAt)';
   }
 
   @override
@@ -233,14 +273,25 @@ class _$CartItemImpl implements _CartItem {
                 other.quantity == quantity) &&
             (identical(other.subtotal, subtotal) ||
                 other.subtotal == subtotal) &&
+            (identical(other.unitPrice, unitPrice) ||
+                other.unitPrice == unitPrice) &&
+            (identical(other.priceId, priceId) || other.priceId == priceId) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, id, product, quantity, subtotal, createdAt);
+  int get hashCode => Object.hash(
+    runtimeType,
+    id,
+    product,
+    quantity,
+    subtotal,
+    unitPrice,
+    priceId,
+    createdAt,
+  );
 
   /// Create a copy of CartItem
   /// with the given fields replaced by the non-null parameter values.
@@ -262,6 +313,8 @@ abstract class _CartItem implements CartItem {
     required final Product product,
     required final int quantity,
     required final double subtotal,
+    @JsonKey(name: 'unit_price') final double? unitPrice,
+    @JsonKey(name: 'price_id') final int? priceId,
     @JsonKey(name: 'created_at') required final DateTime createdAt,
   }) = _$CartItemImpl;
 
@@ -276,6 +329,12 @@ abstract class _CartItem implements CartItem {
   int get quantity;
   @override
   double get subtotal;
+  @override
+  @JsonKey(name: 'unit_price')
+  double? get unitPrice;
+  @override
+  @JsonKey(name: 'price_id')
+  int? get priceId;
   @override
   @JsonKey(name: 'created_at')
   DateTime get createdAt;

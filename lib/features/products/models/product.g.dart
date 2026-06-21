@@ -13,7 +13,7 @@ _$ProductImpl _$$ProductImplFromJson(Map<String, dynamic> json) =>
       slug: json['slug'] as String,
       description: json['description'] as String,
       price: (json['price'] as num).toDouble(),
-      compareAtPrice: (json['compare_at_price'] as num).toDouble(),
+      compareAtPrice: (json['compare_at_price'] as num?)?.toDouble() ?? 0.0,
       currency: json['currency'] as String,
       images:
           (json['images'] as List<dynamic>)

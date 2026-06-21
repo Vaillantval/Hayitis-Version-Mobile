@@ -47,7 +47,11 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 
     ref.read(checkoutProvider.notifier).setLoading(true);
     try {
-      final items = cart.items.map((i) => {'product_id': i.product.id, 'quantity': i.quantity}).toList();
+      final items = cart.items.map((i) => <String, dynamic>{
+        'product_id': i.product.id,
+        'quantity':   i.quantity,
+        if (i.priceId != null) 'price_id': i.priceId!,
+      }).toList();
       final order = await OrderRepository().createOrder(
         items: items,
         paymentMethod: _selectedMethod!,
@@ -59,6 +63,8 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         notes: _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
       );
 
+      // Cart is cleared server-side on order creation; sync local state.
+      ref.read(cartProvider.notifier).reset();
       ref.read(checkoutProvider.notifier).setOrderId(order.id);
 
       switch (_selectedMethod) {

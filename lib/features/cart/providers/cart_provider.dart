@@ -43,6 +43,8 @@ class CartNotifier extends StateNotifier<AsyncValue<Cart?>> {
     await _repo.clearCart();
     state = const AsyncValue.data(null);
   }
+
+  void reset() => state = const AsyncValue.data(null);
 }
 
 final cartProvider = StateNotifierProvider<CartNotifier, AsyncValue<Cart?>>((ref) {

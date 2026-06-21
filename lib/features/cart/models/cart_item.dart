@@ -12,6 +12,8 @@ class CartItem with _$CartItem {
     required Product product,
     required int quantity,
     required double subtotal,
+    @JsonKey(name: 'unit_price') double? unitPrice,
+    @JsonKey(name: 'price_id')   int? priceId,
     @JsonKey(name: 'created_at') required DateTime createdAt,
   }) = _CartItem;
 

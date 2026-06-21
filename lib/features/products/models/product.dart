@@ -14,7 +14,7 @@ class Product with _$Product {
     required String slug,
     required String description,
     required double price,
-    @JsonKey(name: 'compare_at_price') required double compareAtPrice,
+    @JsonKey(name: 'compare_at_price') @Default(0.0) double compareAtPrice,
     required String currency,
     required List<ProductImage> images,
     CategoryBrief? category,
