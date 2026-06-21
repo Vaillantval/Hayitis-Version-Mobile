@@ -14,7 +14,7 @@ class CartRepository {
       final root = response.data as Map<String, dynamic>;
       return Cart.fromJson(root['data'] as Map<String, dynamic>);
     } on DioException catch (e) {
-      throw ApiException.fromJson(e.response?.data as Map<String, dynamic>? ?? {});
+      throw ApiException.fromDio(e);
     }
   }
 
@@ -28,10 +28,7 @@ class CartRepository {
       final root = response.data as Map<String, dynamic>;
       return Cart.fromJson(root['data'] as Map<String, dynamic>);
     } on DioException catch (e) {
-      throw ApiException.fromJson(
-        e.response?.data as Map<String, dynamic>? ?? {},
-        statusCode: e.response?.statusCode,
-      );
+      throw ApiException.fromDio(e);
     }
   }
 
@@ -41,7 +38,7 @@ class CartRepository {
       final root = response.data as Map<String, dynamic>;
       return Cart.fromJson(root['data'] as Map<String, dynamic>);
     } on DioException catch (e) {
-      throw ApiException.fromJson(e.response?.data as Map<String, dynamic>? ?? {});
+      throw ApiException.fromDio(e);
     }
   }
 
@@ -51,7 +48,7 @@ class CartRepository {
       final root = response.data as Map<String, dynamic>;
       return Cart.fromJson(root['data'] as Map<String, dynamic>);
     } on DioException catch (e) {
-      throw ApiException.fromJson(e.response?.data as Map<String, dynamic>? ?? {});
+      throw ApiException.fromDio(e);
     }
   }
 
@@ -59,7 +56,7 @@ class CartRepository {
     try {
       await _dio.delete(Endpoints.cartClear);
     } on DioException catch (e) {
-      throw ApiException.fromJson(e.response?.data as Map<String, dynamic>? ?? {});
+      throw ApiException.fromDio(e);
     }
   }
 }

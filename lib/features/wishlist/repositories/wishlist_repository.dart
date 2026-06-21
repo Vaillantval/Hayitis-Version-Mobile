@@ -16,7 +16,7 @@ class WishlistRepository {
           .map((e) => WishlistItem.fromJson(e as Map<String, dynamic>))
           .toList();
     } on DioException catch (e) {
-      throw ApiException.fromJson(e.response?.data as Map<String, dynamic>? ?? {});
+      throw ApiException.fromDio(e);
     }
   }
 
@@ -24,7 +24,7 @@ class WishlistRepository {
     try {
       await _dio.post(Endpoints.wishlistAdd, data: {'product_id': productId});
     } on DioException catch (e) {
-      throw ApiException.fromJson(e.response?.data as Map<String, dynamic>? ?? {});
+      throw ApiException.fromDio(e);
     }
   }
 
@@ -32,7 +32,7 @@ class WishlistRepository {
     try {
       await _dio.delete(Endpoints.wishlistRemove(wishlistItemId));
     } on DioException catch (e) {
-      throw ApiException.fromJson(e.response?.data as Map<String, dynamic>? ?? {});
+      throw ApiException.fromDio(e);
     }
   }
 }

@@ -16,7 +16,7 @@ class ReviewRepository {
           .map((e) => Review.fromJson(e as Map<String, dynamic>))
           .toList();
     } on DioException catch (e) {
-      throw ApiException.fromJson(e.response?.data as Map<String, dynamic>? ?? {});
+      throw ApiException.fromDio(e);
     }
   }
 
@@ -34,10 +34,7 @@ class ReviewRepository {
       final root = response.data as Map<String, dynamic>;
       return Review.fromJson(root['data'] as Map<String, dynamic>);
     } on DioException catch (e) {
-      throw ApiException.fromJson(
-        e.response?.data as Map<String, dynamic>? ?? {},
-        statusCode: e.response?.statusCode,
-      );
+      throw ApiException.fromDio(e);
     }
   }
 
@@ -45,7 +42,7 @@ class ReviewRepository {
     try {
       await _dio.delete(Endpoints.reviewDetail(id));
     } on DioException catch (e) {
-      throw ApiException.fromJson(e.response?.data as Map<String, dynamic>? ?? {});
+      throw ApiException.fromDio(e);
     }
   }
 }

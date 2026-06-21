@@ -1,4 +1,5 @@
 // lib/core/network/api_error.dart
+import 'package:dio/dio.dart';
 
 class ApiException implements Exception {
   final String code;
@@ -18,6 +19,14 @@ class ApiException implements Exception {
       code: code,
       message: _friendlyMessage(code),
       statusCode: statusCode,
+    );
+  }
+
+  factory ApiException.fromDio(DioException e) {
+    final data = e.response?.data;
+    return ApiException.fromJson(
+      data is Map<String, dynamic> ? data : <String, dynamic>{},
+      statusCode: e.response?.statusCode,
     );
   }
 

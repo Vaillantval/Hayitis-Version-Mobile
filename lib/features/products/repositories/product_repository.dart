@@ -46,7 +46,7 @@ class ProductRepository {
             .toList(),
       );
     } on DioException catch (e) {
-      throw ApiException.fromJson(e.response?.data as Map<String, dynamic>? ?? {});
+      throw ApiException.fromDio(e);
     }
   }
 
@@ -58,7 +58,7 @@ class ProductRepository {
           .map((e) => Product.fromJson(e as Map<String, dynamic>))
           .toList();
     } on DioException catch (e) {
-      throw ApiException.fromJson(e.response?.data as Map<String, dynamic>? ?? {});
+      throw ApiException.fromDio(e);
     }
   }
 
@@ -70,7 +70,7 @@ class ProductRepository {
           .map((e) => Product.fromJson(e as Map<String, dynamic>))
           .toList();
     } on DioException catch (e) {
-      throw ApiException.fromJson(e.response?.data as Map<String, dynamic>? ?? {});
+      throw ApiException.fromDio(e);
     }
   }
 
@@ -82,7 +82,7 @@ class ProductRepository {
           .map((e) => Product.fromJson(e as Map<String, dynamic>))
           .toList();
     } on DioException catch (e) {
-      throw ApiException.fromJson(e.response?.data as Map<String, dynamic>? ?? {});
+      throw ApiException.fromDio(e);
     }
   }
 
@@ -91,7 +91,7 @@ class ProductRepository {
       final response = await _dio.get(Endpoints.productDetail(slug));
       return ProductDetail.fromJson(response.data as Map<String, dynamic>);
     } on DioException catch (e) {
-      throw ApiException.fromJson(e.response?.data as Map<String, dynamic>? ?? {});
+      throw ApiException.fromDio(e);
     }
   }
 
@@ -115,7 +115,7 @@ class ProductRepository {
           .map((e) => Category.fromJson(e as Map<String, dynamic>))
           .toList();
     } on DioException catch (e) {
-      throw ApiException.fromJson(e.response?.data as Map<String, dynamic>? ?? {});
+      throw ApiException.fromDio(e);
     }
   }
 
@@ -126,7 +126,7 @@ class ProductRepository {
       final list = data['results'] as List? ?? data['data'] as List? ?? response.data as List;
       return list.map((e) => HeroSlide.fromJson(e as Map<String, dynamic>)).toList();
     } on DioException catch (e) {
-      throw ApiException.fromJson(e.response?.data as Map<String, dynamic>? ?? {});
+      throw ApiException.fromDio(e);
     }
   }
 }

@@ -20,10 +20,7 @@ class PaymentRepository {
       final root = response.data as Map<String, dynamic>;
       return PaymentInitResponse.fromJson(root['data'] as Map<String, dynamic>);
     } on DioException catch (e) {
-      throw ApiException.fromJson(
-        e.response?.data as Map<String, dynamic>? ?? {},
-        statusCode: e.response?.statusCode,
-      );
+      throw ApiException.fromDio(e);
     }
   }
 
@@ -36,7 +33,7 @@ class PaymentRepository {
       final data = response.data as Map<String, dynamic>;
       return data['success'] == true;
     } on DioException catch (e) {
-      throw ApiException.fromJson(e.response?.data as Map<String, dynamic>? ?? {});
+      throw ApiException.fromDio(e);
     }
   }
 }

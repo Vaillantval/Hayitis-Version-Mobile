@@ -65,7 +65,7 @@ class AdminRepository {
       };
       return AdminDashboard.fromJson(data);
     } on DioException catch (e) {
-      throw ApiException.fromJson(e.response?.data as Map<String, dynamic>? ?? {});
+      throw ApiException.fromDio(e);
     }
   }
 
@@ -90,7 +90,7 @@ class AdminRepository {
       }
       return raws.map((e) => Product.fromJson(_remapProduct(e))).toList();
     } on DioException catch (e) {
-      throw ApiException.fromJson(e.response?.data as Map<String, dynamic>? ?? {});
+      throw ApiException.fromDio(e);
     }
   }
 
@@ -98,7 +98,7 @@ class AdminRepository {
     try {
       await _dio.post(Endpoints.adminProducts, data: data);
     } on DioException catch (e) {
-      throw ApiException.fromJson(e.response?.data as Map<String, dynamic>? ?? {});
+      throw ApiException.fromDio(e);
     }
   }
 
@@ -106,7 +106,7 @@ class AdminRepository {
     try {
       await _dio.patch(Endpoints.adminProductDetail(id), data: data);
     } on DioException catch (e) {
-      throw ApiException.fromJson(e.response?.data as Map<String, dynamic>? ?? {});
+      throw ApiException.fromDio(e);
     }
   }
 
@@ -114,7 +114,7 @@ class AdminRepository {
     try {
       await _dio.delete(Endpoints.adminProductDetail(id));
     } on DioException catch (e) {
-      throw ApiException.fromJson(e.response?.data as Map<String, dynamic>? ?? {});
+      throw ApiException.fromDio(e);
     }
   }
 
@@ -125,7 +125,7 @@ class AdminRepository {
       final data = root.containsKey('data') ? root['data'] as Map<String, dynamic> : root;
       return Product.fromJson(_remapProduct(data));
     } on DioException catch (e) {
-      throw ApiException.fromJson(e.response?.data as Map<String, dynamic>? ?? {});
+      throw ApiException.fromDio(e);
     }
   }
 
@@ -137,7 +137,7 @@ class AdminRepository {
       });
       await _dio.post(Endpoints.adminProductImages(id), data: formData);
     } on DioException catch (e) {
-      throw ApiException.fromJson(e.response?.data as Map<String, dynamic>? ?? {});
+      throw ApiException.fromDio(e);
     }
   }
 
@@ -154,7 +154,7 @@ class AdminRepository {
           .map((e) => Order.fromJson(e as Map<String, dynamic>))
           .toList();
     } on DioException catch (e) {
-      throw ApiException.fromJson(e.response?.data as Map<String, dynamic>? ?? {});
+      throw ApiException.fromDio(e);
     }
   }
 
@@ -164,7 +164,7 @@ class AdminRepository {
       final root = response.data as Map<String, dynamic>;
       return Order.fromJson(root['data'] as Map<String, dynamic>);
     } on DioException catch (e) {
-      throw ApiException.fromJson(e.response?.data as Map<String, dynamic>? ?? {});
+      throw ApiException.fromDio(e);
     }
   }
 
@@ -172,7 +172,7 @@ class AdminRepository {
     try {
       await _dio.patch(Endpoints.adminOrderStatus(id), data: {'status': status});
     } on DioException catch (e) {
-      throw ApiException.fromJson(e.response?.data as Map<String, dynamic>? ?? {});
+      throw ApiException.fromDio(e);
     }
   }
 
@@ -184,7 +184,7 @@ class AdminRepository {
           .map((e) => UserProfile.fromJson(e as Map<String, dynamic>))
           .toList();
     } on DioException catch (e) {
-      throw ApiException.fromJson(e.response?.data as Map<String, dynamic>? ?? {});
+      throw ApiException.fromDio(e);
     }
   }
 
@@ -194,7 +194,7 @@ class AdminRepository {
       final root = response.data as Map<String, dynamic>;
       return root['data'] as Map<String, dynamic>;
     } on DioException catch (e) {
-      throw ApiException.fromJson(e.response?.data as Map<String, dynamic>? ?? {});
+      throw ApiException.fromDio(e);
     }
   }
 
@@ -206,7 +206,7 @@ class AdminRepository {
           .map((e) => InventoryItem.fromJson(e as Map<String, dynamic>))
           .toList();
     } on DioException catch (e) {
-      throw ApiException.fromJson(e.response?.data as Map<String, dynamic>? ?? {});
+      throw ApiException.fromDio(e);
     }
   }
 
@@ -214,7 +214,7 @@ class AdminRepository {
     try {
       await _dio.patch(Endpoints.adminInventoryDetail(id), data: {'stock_quantity': stockQuantity});
     } on DioException catch (e) {
-      throw ApiException.fromJson(e.response?.data as Map<String, dynamic>? ?? {});
+      throw ApiException.fromDio(e);
     }
   }
 
@@ -234,7 +234,7 @@ class AdminRepository {
       data['total_orders_all'] = (results[1].data as Map<String, dynamic>)['count'] as int? ?? 0;
       return data;
     } on DioException catch (e) {
-      throw ApiException.fromJson(e.response?.data as Map<String, dynamic>? ?? {});
+      throw ApiException.fromDio(e);
     }
   }
 
@@ -246,7 +246,7 @@ class AdminRepository {
       if (data is List) return {'results': data};
       return (data as Map<String, dynamic>?) ?? {};
     } on DioException catch (e) {
-      throw ApiException.fromJson(e.response?.data as Map<String, dynamic>? ?? {});
+      throw ApiException.fromDio(e);
     }
   }
 
@@ -267,7 +267,7 @@ class AdminRepository {
       }
       return list.map((e) => Category.fromJson(e as Map<String, dynamic>)).toList();
     } on DioException catch (e) {
-      throw ApiException.fromJson(e.response?.data as Map<String, dynamic>? ?? {});
+      throw ApiException.fromDio(e);
     }
   }
 
@@ -280,7 +280,7 @@ class AdminRepository {
       });
       await _dio.post(Endpoints.adminCategories, data: formData);
     } on DioException catch (e) {
-      throw ApiException.fromJson(e.response?.data as Map<String, dynamic>? ?? {});
+      throw ApiException.fromDio(e);
     }
   }
 
@@ -296,7 +296,7 @@ class AdminRepository {
         await _dio.patch(Endpoints.adminCategoryDetail(id), data: data);
       }
     } on DioException catch (e) {
-      throw ApiException.fromJson(e.response?.data as Map<String, dynamic>? ?? {});
+      throw ApiException.fromDio(e);
     }
   }
 
@@ -304,7 +304,7 @@ class AdminRepository {
     try {
       await _dio.delete(Endpoints.adminCategoryDetail(id));
     } on DioException catch (e) {
-      throw ApiException.fromJson(e.response?.data as Map<String, dynamic>? ?? {});
+      throw ApiException.fromDio(e);
     }
   }
 
@@ -316,7 +316,7 @@ class AdminRepository {
       if (data is List) return {'results': data};
       return (data as Map<String, dynamic>?) ?? {};
     } on DioException catch (e) {
-      throw ApiException.fromJson(e.response?.data as Map<String, dynamic>? ?? {});
+      throw ApiException.fromDio(e);
     }
   }
 }

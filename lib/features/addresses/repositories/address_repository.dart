@@ -16,7 +16,7 @@ class AddressRepository {
           .map((e) => Address.fromJson(e as Map<String, dynamic>))
           .toList();
     } on DioException catch (e) {
-      throw ApiException.fromJson(e.response?.data as Map<String, dynamic>? ?? {});
+      throw ApiException.fromDio(e);
     }
   }
 
@@ -26,7 +26,7 @@ class AddressRepository {
       final root = response.data as Map<String, dynamic>;
       return Address.fromJson(root['data'] as Map<String, dynamic>);
     } on DioException catch (e) {
-      throw ApiException.fromJson(e.response?.data as Map<String, dynamic>? ?? {});
+      throw ApiException.fromDio(e);
     }
   }
 
@@ -36,7 +36,7 @@ class AddressRepository {
       final root = response.data as Map<String, dynamic>;
       return Address.fromJson(root['data'] as Map<String, dynamic>);
     } on DioException catch (e) {
-      throw ApiException.fromJson(e.response?.data as Map<String, dynamic>? ?? {});
+      throw ApiException.fromDio(e);
     }
   }
 
@@ -44,7 +44,7 @@ class AddressRepository {
     try {
       await _dio.delete(Endpoints.addressDetail(id));
     } on DioException catch (e) {
-      throw ApiException.fromJson(e.response?.data as Map<String, dynamic>? ?? {});
+      throw ApiException.fromDio(e);
     }
   }
 
@@ -52,7 +52,7 @@ class AddressRepository {
     try {
       await _dio.patch(Endpoints.addressDefault(id));
     } on DioException catch (e) {
-      throw ApiException.fromJson(e.response?.data as Map<String, dynamic>? ?? {});
+      throw ApiException.fromDio(e);
     }
   }
 }

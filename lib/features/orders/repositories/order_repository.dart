@@ -17,7 +17,7 @@ class OrderRepository {
           .map((e) => Order.fromJson(e as Map<String, dynamic>))
           .toList();
     } on DioException catch (e) {
-      throw ApiException.fromJson(e.response?.data as Map<String, dynamic>? ?? {});
+      throw ApiException.fromDio(e);
     }
   }
 
@@ -37,10 +37,7 @@ class OrderRepository {
       final root = response.data as Map<String, dynamic>;
       return Order.fromJson(root['data'] as Map<String, dynamic>);
     } on DioException catch (e) {
-      throw ApiException.fromJson(
-        e.response?.data as Map<String, dynamic>? ?? {},
-        statusCode: e.response?.statusCode,
-      );
+      throw ApiException.fromDio(e);
     }
   }
 
@@ -50,7 +47,7 @@ class OrderRepository {
       final root = response.data as Map<String, dynamic>;
       return Order.fromJson(root['data'] as Map<String, dynamic>);
     } on DioException catch (e) {
-      throw ApiException.fromJson(e.response?.data as Map<String, dynamic>? ?? {});
+      throw ApiException.fromDio(e);
     }
   }
 
@@ -58,10 +55,7 @@ class OrderRepository {
     try {
       await _dio.post(Endpoints.orderCancel(id));
     } on DioException catch (e) {
-      throw ApiException.fromJson(
-        e.response?.data as Map<String, dynamic>? ?? {},
-        statusCode: e.response?.statusCode,
-      );
+      throw ApiException.fromDio(e);
     }
   }
 
@@ -75,7 +69,7 @@ class OrderRepository {
       final root = response.data as Map<String, dynamic>;
       return OrderTracking.fromJson(root['data'] as Map<String, dynamic>);
     } on DioException catch (e) {
-      throw ApiException.fromJson(e.response?.data as Map<String, dynamic>? ?? {});
+      throw ApiException.fromDio(e);
     }
   }
 }

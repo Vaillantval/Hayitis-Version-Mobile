@@ -34,10 +34,7 @@ class AuthRepository {
       FcmService.listenTokenRefresh();
       return (tokens: tokens, profile: profile);
     } on DioException catch (e) {
-      throw ApiException.fromJson(
-        e.response?.data as Map<String, dynamic>? ?? {},
-        statusCode: e.response?.statusCode,
-      );
+      throw ApiException.fromDio(e);
     }
   }
 
@@ -73,10 +70,7 @@ class AuthRepository {
       FcmService.listenTokenRefresh();
       return (tokens: tokens, profile: profile);
     } on DioException catch (e) {
-      throw ApiException.fromJson(
-        e.response?.data as Map<String, dynamic>? ?? {},
-        statusCode: e.response?.statusCode,
-      );
+      throw ApiException.fromDio(e);
     }
   }
 
@@ -94,10 +88,7 @@ class AuthRepository {
       final root = response.data as Map<String, dynamic>;
       return UserProfile.fromJson(root['data'] as Map<String, dynamic>);
     } on DioException catch (e) {
-      throw ApiException.fromJson(
-        e.response?.data as Map<String, dynamic>? ?? {},
-        statusCode: e.response?.statusCode,
-      );
+      throw ApiException.fromDio(e);
     }
   }
 
@@ -107,10 +98,7 @@ class AuthRepository {
       final root = response.data as Map<String, dynamic>;
       return UserProfile.fromJson(root['data'] as Map<String, dynamic>);
     } on DioException catch (e) {
-      throw ApiException.fromJson(
-        e.response?.data as Map<String, dynamic>? ?? {},
-        statusCode: e.response?.statusCode,
-      );
+      throw ApiException.fromDio(e);
     }
   }
 
@@ -126,10 +114,7 @@ class AuthRepository {
         'new_password2': newPassword2,
       });
     } on DioException catch (e) {
-      throw ApiException.fromJson(
-        e.response?.data as Map<String, dynamic>? ?? {},
-        statusCode: e.response?.statusCode,
-      );
+      throw ApiException.fromDio(e);
     }
   }
 

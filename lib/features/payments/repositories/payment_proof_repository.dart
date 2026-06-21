@@ -23,10 +23,7 @@ class PaymentProofRepository {
         options: Options(contentType: 'multipart/form-data'),
       );
     } on DioException catch (e) {
-      throw ApiException.fromJson(
-        e.response?.data as Map<String, dynamic>? ?? {},
-        statusCode: e.response?.statusCode,
-      );
+      throw ApiException.fromDio(e);
     }
   }
 }
